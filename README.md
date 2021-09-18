@@ -15,17 +15,21 @@ Please implement these features on the webpage:
 
   Style: User can set current column style, e.g. Data Type, Default Value, Font, Color, Alignment, Text-wrap.
 
-  Freeze On/Off: Freeze all columns to the left of current column, See https://ej2.syncfusion.com/demos/#/material/tree-grid/frozen-column.html
+  Freeze On/Off: Freeze all columns to the left of current column,
+  See https://ej2.syncfusion.com/demos/#/material/tree-grid/frozen-column.html
 
-  Filter On/Off: Enable Filter Bar in Parent Hierarchy Mode, See https://ej2.syncfusion.com/demos/#/material/tree-grid/filtering.html
+  Filter On/Off: Enable Filter Bar in Parent Hierarchy Mode,
+  See https://ej2.syncfusion.com/demos/#/material/tree-grid/filtering.html
 
-  Multi-Sort On/Off: Enable Multi-Sort for all columns, See https://ej2.syncfusion.com/demos/#/material/tree-grid/sorting.html
+  Multi-Sort On/Off: Enable Multi-Sort for all columns,
+  See https://ej2.syncfusion.com/demos/#/material/tree-grid/sorting.html
 
   Add; Del; Edit: Users can Add/Del/Edit columns, (also Drag-n-drop to Reorder & Resize columns).
 
 
 **** Context Menu 2 (right-click or long-press) on any "Row", to pop-up these menu items:
-  Multi-Select On/Off: Enable users to multi-select rows on both PC and Mobile, See https://ej2.syncfusion.com/demos/#/material/tree-grid/clipboard.html
+  Multi-Select On/Off: Enable users to multi-select rows on both PC and Mobile,
+  See https://ej2.syncfusion.com/demos/#/material/tree-grid/clipboard.html
 
   Copy; Cut: Copy/Cut multi-selected rows - similar to how MS Windows File Explorer copy/cut Files (leaf rows) and Folders (non-leaf rows).
 
