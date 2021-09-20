@@ -1,11 +1,12 @@
 <div class="control-section">
-  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [allowMultiSorting]='allowMultiSorting'
-    childMapping='subtasks' [treeColumnIndex]='1' [allowResizing]='allowResizing' [editSettings]='editSettings'
-    [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow' [frozenColumns]='frozenColumn'
-    (contextMenuClick)='contextMenuClick($event)' [allowSorting]='true' [allowFiltering]='allowFiltering'
+  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='allowMultiSorting'
+    [allowMultiSorting]='allowMultiSorting' childMapping='subtasks' [selectionSettings]='selectionOptions'
+    [allowSelection]='true' [treeColumnIndex]='1' [allowResizing]='allowResizing' [editSettings]='editSettings'
+    [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
+    [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
     [allowReordering]='allowReordering'>
     <e-columns>
-      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right'></e-column>
+      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right' isPrimaryKey='true'></e-column>
       <e-column field='taskName' headerText='Task Name' width='200'></e-column>
       <e-column field='startDate' headerText='Start Date' width='90' format="yMd" textAlign='Right'></e-column>
       <e-column field='endDate' headerText='End Date' width='90' format="yMd" textAlign='Right'></e-column>
@@ -14,4 +15,32 @@
       <e-column field='priority' headerText='Priority' width='90'></e-column>
     </e-columns>
   </ejs-treegrid>
+  <!-- <ejs-dialog #template [height]='height' [animationSettings]='animationSettings' [showCloseIcon]='showCloseIcon'
+    [target]='target' [width]='width'>
+    <ng-template #footerTemplate>
+      <input id="background-color" #bgColor class="e-input" type="text" placeholder="Enter bg color" />
+      <input id="colWidth" #colWidth class="e-input" type="text" placeholder="Enter col width" />
+
+      <button id="sendButton" (click)="updateStyle()" class="e-control e-btn e-primary sendButton"
+        data-ripple="true">Update
+        Style</button>
+    </ng-template>
+    <ng-template #header>
+      Customize
+    </ng-template>
+  </ejs-dialog> -->
+  <ejs-dialog #template [header]='header' [animationSettings]='animationSettings' [visible]='false'
+    [showCloseIcon]='showCloseIcon' [isModal]='true' [target]='target' [width]='width'>
+    <ng-template #footerTemplate>
+      <input id="field" #field class="e-input" type="text" placeholder="Enter field name" />
+      <input id="headerText" #headerText class="e-input" type="text" placeholder="Enter header text" />
+
+      <button id="sendButton" (click)="addColumn()" class="e-control e-btn e-primary sendButton" data-ripple="true">Add
+        column</button>
+    </ng-template>
+    <ng-template #header>
+      Create new column
+    </ng-template>
+  </ejs-dialog>
+
 </div>
