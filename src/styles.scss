@@ -1,0 +1,44 @@
+/* You can add global styles to this file, and also import other style files */
+.e-style:before {
+  content: '\e686';
+}
+
+#gridcomp {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+div.e-movableheader>table {
+  width: 100% !important;
+}
+
+#gridcomp_content_table {
+  width: 100% !important;
+}
+
+td.e-rowcell {
+  border: 1px solid #CCC !important;
+  cursor: pointer;
+}
+
+.e-freeze:before {
+  content: '\e88d';
+}
+
+.e-sort:before {
+  content: '\e890';
+}
+
+.e-filter:before {
+  content: '\e736';
+}
+
+.grid-freezeprop {
+  padding-bottom: 5px;
+}
+
+.grid-freezecol {
+  display: inline-block;
+  padding-right: 10px;
+}
