@@ -76,6 +76,7 @@
     "@syncfusion/ej2-angular-pivotview": "19.2.60",
     "@syncfusion/ej2-angular-schedule": "19.2.60",
     "@syncfusion/ej2-angular-layouts": "19.2.60",
+    "@syncfusion/ej2-angular-treegrid": "^19.2.60",
     "@angular/http": "7.2.16",
     "rxjs-compat": "6.6.7",
     "@syncfusion/ej2-buttons": "19.2.60",

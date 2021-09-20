@@ -1,15 +1,17 @@
 <div class="control-section">
-  <ejs-grid #grid [dataSource]='data' id="gridcomp" [allowSorting]='true' [allowMultiSorting]='allowMultiSorting'
-    [allowResizing]='allowResizing' [editSettings]='editSettings' [contextMenuItems]="contextMenuItems"
-    [frozenRows]='frozenRow' [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)'
-    [allowSorting]='true' [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'>
+  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [allowMultiSorting]='allowMultiSorting'
+    childMapping='subtasks' [treeColumnIndex]='1' [allowResizing]='allowResizing' [editSettings]='editSettings'
+    [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow' [frozenColumns]='frozenColumn'
+    (contextMenuClick)='contextMenuClick($event)' [allowSorting]='true' [allowFiltering]='allowFiltering'
+    [allowReordering]='allowReordering'>
     <e-columns>
-      <e-column field='OrderID' headerText='Order ID' width='120' textAlign='Right' isPrimaryKey='true'></e-column>
-      <e-column field='CustomerName' headerText='Customer Name'></e-column>
-      <e-column field='Freight' headerText='Freight' format='C2' textAlign='Right' editType='numericedit'></e-column>
-      <e-column field='ShipName' headerText='Ship Name' width='200'></e-column>
-      <e-column field='ShipCountry' headerText='Ship Country' width='150' editType='dropdownedit'></e-column>
-      <e-column field='ShipCity' headerText='Ship City' width='150'></e-column>
+      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right'></e-column>
+      <e-column field='taskName' headerText='Task Name' width='200'></e-column>
+      <e-column field='startDate' headerText='Start Date' width='90' format="yMd" textAlign='Right'></e-column>
+      <e-column field='endDate' headerText='End Date' width='90' format="yMd" textAlign='Right'></e-column>
+      <e-column field='duration' headerText='Duration' width='80' textAlign='Right'></e-column>
+      <e-column field='progress' headerText='Progress' width='80' textAlign='Right'></e-column>
+      <e-column field='priority' headerText='Priority' width='90'></e-column>
     </e-columns>
-  </ejs-grid>
+  </ejs-treegrid>
 </div>
