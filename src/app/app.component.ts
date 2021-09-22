@@ -1,14 +1,10 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
-// import { detach, isNullOrUndefined } from '@syncfusion/ej2-base';
-// import { ButtonComponent } from '@syncfusion/ej2-angular-buttons';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, GridComponent, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
-// import { TreeGrid, Resize, ExcelExport, PdfExport, Edit, Page, ContextMenu, Sort } from '@syncfusion/ej2-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
-
 import { ContextMenuItem, GroupSettingsModel, EditSettingsModel, ContextMenuItemModel } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './jsontreedata';
-
+import { sampleData1 } from './data-source';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -51,11 +47,9 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.data = sampleData;
+    this.data = sampleData1;
     this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Copy',
-      // { text: 'Copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
-
       { text: 'Add Column', target: '.e-headercontent', id: 'addcolumn', iconCss: 'e-icons e-add-col' },
       { text: 'Edit Column', target: '.e-headercontent', id: 'editcolumn', iconCss: 'e-icons e-edit-col' },
       { text: 'Del Column', target: '.e-headercontent', id: 'delcolumn', iconCss: 'e-icons e-del-col' },
@@ -74,14 +68,11 @@ export class AppComponent implements OnInit {
       column.visible = false;
       this.grid.refreshColumns();
     }
-    if (args.item.id === 'pastechild') {
-      let newData = this.getDataFromClipBoard();
-      // this.data.push(newData);
-      console.log(args['rowInfo']['childRecords'].push(newData));
-    }
+    // if (args.item.id === 'pastechild') {
+    //   let newData = this.getDataFromClipBoard();
+    //   console.log(args['rowInfo']['childRecords'].push(newData));
+    // }
     if (args.item.id === 'freezecolumn') {
-
-      //this.getIndex(column.field);
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
     }
 
@@ -105,18 +96,25 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'editcolumn') {
       this.isEditOperation = true;
-      this.align.nativeElement.value = args['column']['align'];
+      this.align.nativeElement.value = args['column']['textAlign'] != null ? args['column']['textAlign'] : 'Left';
       this.defaultValue.nativeElement.value = args['column']['defaultValue'] != undefined ? args['column']['defaultValue'] : '';
       this.field.nativeElement.value = args['column']['field'];
       this.headerText.nativeElement.value = args['column']['headerText'];
       this.Dialog.show();
 
     }
-    if (args.item.id === 'paste') {
+    if (args.item.id === 'pastechild') {
+      this.editSettings.newRowPosition = "Child";
+      console.log(this.editSettings);
       let newData = this.getDataFromClipBoard();
       this.grid.addRecord(newData, args['rowInfo'].rowIndex);
-      // this.grid.selectRow(args['rowInfo'].rowIndex);
-
+    }
+    if (args.item.id === 'paste') {
+      console.log(1);
+      console.log(this.editSettings);
+      this.editSettings.newRowPosition = "Below";
+      let newData = this.getDataFromClipBoard();
+      this.grid.addRecord(newData, args['rowInfo'].rowIndex);
     }
   }
   public addColumn = (): void => {
@@ -133,14 +131,10 @@ export class AppComponent implements OnInit {
   public editColumn = (): void => {
     // let index = this.colIndex.nativeElement.value;
     let field = this.field.nativeElement.value;
-    let headerText = this.headerText.nativeElement.value;
-    let defaultValue = this.defaultValue.nativeElement.value;
-    let textAlign = this.align.nativeElement.value;
-    this.grid.getColumnByField(field).headerText = headerText;
-    this.grid.getColumnByField(field).field = field;
-
-    this.grid.getColumnByField(field).textAlign = textAlign;
-    this.grid.getColumnByField(field).defaultValue = defaultValue;
+    this.grid.getColumnByField(field).headerText = this.headerText.nativeElement.value;
+    this.grid.getColumnByField(field).field = this.field.nativeElement.value;
+    this.grid.getColumnByField(field).textAlign = this.align.nativeElement.value;
+    this.grid.getColumnByField(field).defaultValue = this.defaultValue.nativeElement.value;
     this.grid.refreshColumns();
     this.Dialog.hide();
 
@@ -158,8 +152,6 @@ export class AppComponent implements OnInit {
     };
     this.grid.refreshColumns();
     this.styleDialog.hide();
-    // this.bgColor.nativeElement.value = '';
-    // this.colWidth.nativeElement.value = '';
   }
   public getDataFromClipBoard(): object {
 
@@ -167,7 +159,6 @@ export class AppComponent implements OnInit {
     navigator['clipboard'].readText().then((data) => {
       //console.log(data);
       let lines = data.split('\n');
-      console.log(lines);
       let req = lines.pop().split('\t')
       var output = this.getColumns().map(function (obj, index) {
         myobj[obj] = req[index];
