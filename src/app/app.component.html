@@ -6,7 +6,7 @@
     [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
     [allowReordering]='allowReordering'>
     <e-columns>
-      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right' isPrimaryKey='true'></e-column>
+      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right'></e-column>
       <e-column field='taskName' headerText='Task Name' width='200'></e-column>
       <e-column field='startDate' headerText='Start Date' width='90' format="yMd" textAlign='Right'></e-column>
       <e-column field='endDate' headerText='End Date' width='90' format="yMd" textAlign='Right'></e-column>
@@ -15,31 +15,96 @@
       <e-column field='priority' headerText='Priority' width='90'></e-column>
     </e-columns>
   </ejs-treegrid>
-  <!-- <ejs-dialog #template [height]='height' [animationSettings]='animationSettings' [showCloseIcon]='showCloseIcon'
-    [target]='target' [width]='width'>
-    <ng-template #footerTemplate>
-      <input id="background-color" #bgColor class="e-input" type="text" placeholder="Enter bg color" />
-      <input id="colWidth" #colWidth class="e-input" type="text" placeholder="Enter col width" />
 
-      <button id="sendButton" (click)="updateStyle()" class="e-control e-btn e-primary sendButton"
-        data-ripple="true">Update
-        Style</button>
-    </ng-template>
-    <ng-template #header>
-      Customize
-    </ng-template>
-  </ejs-dialog> -->
   <ejs-dialog #template [header]='header' [animationSettings]='animationSettings' [visible]='false'
     [showCloseIcon]='showCloseIcon' [isModal]='true' [target]='target' [width]='width'>
     <ng-template #footerTemplate>
-      <input id="field" #field class="e-input" type="text" placeholder="Enter field name" />
-      <input id="headerText" #headerText class="e-input" type="text" placeholder="Enter header text" />
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-3 control-label">Field Name</label>
+          <div class="col-sm-9">
+            <input id="field" #field type="text" placeholder="Enter field name" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="disabledInput" class="col-sm-3 control-label">Header Text</label>
+          <div class="col-sm-9">
+            <input id="headerText" #headerText type="text" placeholder="Enter header text" class="form-control" />
+          </div>
+        </div>
+        <fieldset>
+          <div class=" form-group">
+            <label for="disabledTextInput" class="col-sm-3 control-label">Default Value</label>
+            <div class="col-sm-9">
+              <input id="defaultValue" #defaultValue class="form-control" type="text"
+                placeholder="Enter default value" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="disabledSelect" class="col-sm-3 control-label">Alignment</label>
+            <div class="col-sm-9">
+              <select id="disabledSelect" #align class="form-control">
+                <option value="" disabled selected>Select alignment</option>
+                <option>Center</option>
+                <option>Left</option>
+                <option>Right</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </form>
 
-      <button id="sendButton" (click)="addColumn()" class="e-control e-btn e-primary sendButton" data-ripple="true">Add
+
+
+
+
+
+
+      <button *ngIf="isEditOperation" id="sendButton" (click)="editColumn()"
+        class="e-control e-btn e-primary sendButton" data-ripple="true">Edit
+        column</button>
+      <button *ngIf="!isEditOperation" id="sendButton" (click)="addColumn()"
+        class="e-control e-btn e-primary sendButton" data-ripple="true">Add
         column</button>
     </ng-template>
     <ng-template #header>
-      Create new column
+
+      <span *ngIf="isEditOperation">Edit column</span>
+      <span *ngIf="!isEditOperation">Create new column</span>
+    </ng-template>
+  </ejs-dialog>
+
+  <ejs-dialog #styleDialog [header]='header' [animationSettings]='animationSettings' [visible]='false'
+    [showCloseIcon]='showCloseIcon' [isModal]='true' [target]='target' [width]='width'>
+    <ng-template #footerTemplate>
+      <div class="col-md-12 new-row">
+        <div class="col-md-6"><label for="bgColor">Select background color:</label></div>
+        <div class="col-md-6"><input type="color" #bgColor id="bgColor" name="bgColor" value="#ffffff" class="fl"></div>
+      </div>
+      <div class="col-md-12 new-row">
+        <div class="col-md-6"> <label for="color">Select font color:</label></div>
+        <div class="col-md-6"> <input type="color" id="color" #color name="color" value="#0000" class="fl"></div>
+      </div>
+      <div class="col-md-12 new-row">
+        <div class="col-md-6"> <label for="fontSize">Select font size:</label></div>
+        <div class="col-md-6"> <input type="fontSize" id="fontSize" #fontSize name="fontSizes" value="" class="fl">
+        </div>
+      </div>
+      <div class="col-md-12 new-row">
+        <div class="col-md-6"> <label for="fontFamily">Select font color:</label></div>
+        <div class="col-md-6"> <input type="fontFamily" id="fontFamily" #fontFamily name="fontFamily" value=""
+            class="fl"></div>
+      </div>
+
+      <input type="hidden" value="" #colField>
+
+      <button id="sendButton" (click)="updateStyle()" class="new-row e-control e-btn e-primary sendButton"
+        data-ripple="true">Update
+        style</button>
+
+    </ng-template>
+    <ng-template #header>
+      <span>Edit style</span>
     </ng-template>
   </ejs-dialog>
 
