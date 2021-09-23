@@ -4,32 +4,55 @@
 
 import * as faker from 'ng-faker';
 
-export let sampleData1 = [
+export let sampleData = [
 ];
 let j = 1;
-for (let i = 0; i < 1000; i++) {
+for (let i = 0; i < 1; i++) {
     let data = {
         taskID: j++,
-        taskName: faker.name.firstName(),
-        startDate: new Date('02/03/2017'),
-        endDate: new Date('02/07/2017'),
-        progress: 100,
-        duration: 5,
+        assignee: faker.name.firstName(),
+        email: faker.internet.email(),
+        progress: faker.random.number({
+            'min': 0,
+            'max': 100
+        }),
+        duration: faker.random.number({
+            'min': 0,
+            'max': 5
+        }),
         priority: 'Normal',
         approved: false,
         subtasks: [
             {
-                taskID: j++, taskName: 'Plan timeline', startDate: new Date('02/03/2017'),
-                endDate: new Date('02/07/2017'), duration: 5, progress: 100, priority: 'Normal', approved: false
+                taskID: j++, assignee: 'Plan timeline', email: faker.internet.email(),
+                duration: faker.random.number({
+                    'min': 0,
+                    'max': 5
+                }), progress: faker.random.number({
+                    'min': 0,
+                    'max': 100
+                }), priority: 'Normal', approved: false
             },
             {
-                taskID: j++, taskName: 'Plan budget', startDate: new Date('02/03/2017'),
-                endDate: new Date('02/07/2017'), duration: 5, progress: 100, priority: 'Low', approved: true
+                taskID: j++, assignee: 'Plan budget', email: faker.internet.email(),
+                duration: faker.random.number({
+                    'min': 0,
+                    'max': 5
+                }), progress: faker.random.number({
+                    'min': 0,
+                    'max': 100
+                }), priority: 'Low', approved: true
             },
             {
-                taskID: j++, taskName: 'Allocate resources', startDate: new Date('02/03/2017'),
-                endDate: new Date('02/07/2017'), duration: 5, progress: 100, priority: 'Critical', approved: false
+                taskID: j++, assignee: 'Allocate resources', email: faker.internet.email(),
+                duration: faker.random.number({
+                    'min': 0,
+                    'max': 5
+                }), progress: faker.random.number({
+                    'min': 0,
+                    'max': 100
+                }), priority: 'Critical', approved: false
             },]
     }
-    sampleData1.push(data);
+    sampleData.push(data);
 }

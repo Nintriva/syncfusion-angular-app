@@ -2,9 +2,8 @@ import { Component, OnInit, ViewChild, ViewEncapsulation, ElementRef } from '@an
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, GridComponent, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
-import { ContextMenuItem, GroupSettingsModel, EditSettingsModel, ContextMenuItemModel } from '@syncfusion/ej2-angular-grids';
-import { sampleData } from './jsontreedata';
-import { sampleData1 } from './data-source';
+import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
+import { sampleData } from './data-source';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -35,6 +34,7 @@ export class AppComponent implements OnInit {
   public contextMenuItems: any;
   public editing: EditSettingsModel;
   public allowMultiSorting: boolean = true;
+  public enableCollapseAll: boolean = false;
   public allowFiltering: boolean = false;
   public allowResizing: boolean = true;
   public allowReordering: boolean = true;
@@ -47,37 +47,40 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.data = sampleData1;
+    this.data = sampleData;
     this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Copy',
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
+      { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
       { text: 'Add Column', target: '.e-headercontent', id: 'addcolumn', iconCss: 'e-icons e-add-col' },
       { text: 'Edit Column', target: '.e-headercontent', id: 'editcolumn', iconCss: 'e-icons e-edit-col' },
       { text: 'Del Column', target: '.e-headercontent', id: 'delcolumn', iconCss: 'e-icons e-del-col' },
       { text: 'Filter On/Off', target: '.e-headercontent', id: 'filter', iconCss: 'e-icons e-filter' },
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
-      { text: 'Paste as new item', target: '.e-content', id: 'paste', iconCss: 'e-icons e-copy' },
+      { text: 'Paste as sibbiling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-copy' },
       { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-copy' }
     ];
 
   }
   contextMenuClick(args: MenuEventArgs): void {
 
-    let column = this.grid.getColumnByField(args['column'].field); // Get
+    // Get
     if (args.item.id === 'delcolumn') {
+      let column = this.grid.getColumnByField(args['column'].field);
       column.visible = false;
       this.grid.refreshColumns();
     }
-    // if (args.item.id === 'pastechild') {
-    //   let newData = this.getDataFromClipBoard();
-    //   console.log(args['rowInfo']['childRecords'].push(newData));
-    // }
+
     if (args.item.id === 'freezecolumn') {
+      let column = this.grid.getColumnByField(args['column'].field);
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
     }
 
     if (args.item.id === 'filter') {
       this.allowFiltering = !this.allowFiltering;
+    }
+    if (args.item.id === 'collapse') {
+      this.enableCollapseAll = !this.enableCollapseAll;
     }
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
@@ -105,16 +108,31 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'pastechild') {
       this.editSettings.newRowPosition = "Child";
-      console.log(this.editSettings);
       let newData = this.getDataFromClipBoard();
+
+      setTimeout(() => {
+        let newObj = this.convertIntObj({ ...newData });
+        console.log(newObj);
+        this.grid.addRecord({ ...newObj }, args['rowInfo'].rowIndex);
+        // let a = this.grid.dataSource.slice().push({ ...newObj });
+        // this.grid.dataSource = a;
+        this.grid.refresh()
+      }
+        , 1000);
+
       this.grid.addRecord(newData, args['rowInfo'].rowIndex);
+      //this.grid.refresh();
     }
     if (args.item.id === 'paste') {
-      console.log(1);
-      console.log(this.editSettings);
       this.editSettings.newRowPosition = "Below";
       let newData = this.getDataFromClipBoard();
-      this.grid.addRecord(newData, args['rowInfo'].rowIndex);
+      console.log(newData);
+      setTimeout(() => {
+        let newObj = this.convertIntObj(newData);
+        this.grid.addRecord(newObj, args['rowInfo'].rowIndex);
+        // this.grid.refresh()
+      }
+        , 1000);
     }
   }
   public addColumn = (): void => {
@@ -155,9 +173,8 @@ export class AppComponent implements OnInit {
   }
   public getDataFromClipBoard(): object {
 
-    var myobj = {};
+    let myobj = {};
     navigator['clipboard'].readText().then((data) => {
-      //console.log(data);
       let lines = data.split('\n');
       let req = lines.pop().split('\t')
       var output = this.getColumns().map(function (obj, index) {
@@ -182,6 +199,15 @@ export class AppComponent implements OnInit {
       columns.push(arrayItem['field']);
     });
     return columns;
+  }
+
+  public convertIntObj(obj) {
+    const res = {}
+    for (const key in obj) {
+      const parsed = parseInt(obj[key]);
+      res[key] = isNaN(parsed) ? obj[key] : parsed;
+    }
+    return res;
   }
 
 }
