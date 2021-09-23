@@ -31,7 +31,8 @@ for (let i = 0; i < 1; i++) {
                 }), progress: faker.random.number({
                     'min': 0,
                     'max': 100
-                }), priority: 'Normal', approved: false
+                }), priority: 'Normal', approved: false,
+                subtasks: []
             },
             {
                 taskID: j++, assignee: 'Plan budget', email: faker.internet.email(),
@@ -41,7 +42,8 @@ for (let i = 0; i < 1; i++) {
                 }), progress: faker.random.number({
                     'min': 0,
                     'max': 100
-                }), priority: 'Low', approved: true
+                }), priority: 'Low', approved: true,
+                subtasks: []
             },
             {
                 taskID: j++, assignee: 'Allocate resources', email: faker.internet.email(),
@@ -51,7 +53,8 @@ for (let i = 0; i < 1; i++) {
                 }), progress: faker.random.number({
                     'min': 0,
                     'max': 100
-                }), priority: 'Critical', approved: false
+                }), priority: 'Critical', approved: false,
+                subtasks: []
             },]
     }
     sampleData.push(data);

@@ -1,15 +1,19 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, GridComponent, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
+
 import { sampleData } from './data-source';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   providers: [SortService, ResizeService, PageService, EditService, ExcelExportService, FreezeService, PdfExportService, ContextMenuService]
 })
+
 export class AppComponent implements OnInit {
+
   @ViewChild('grid') public grid: GridComponent;
   @ViewChild('template') public Dialog: DialogComponent;
   @ViewChild('styleDialog') public styleDialog: DialogComponent;
@@ -42,12 +46,13 @@ export class AppComponent implements OnInit {
   public isEditOperation: boolean = false;
   public frozenRow: number = 0;
   public frozenColumn: number = 0;
-  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: 'Child' };
+  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: 'Child'};
   public selectionOptions: { type: 'Multiple' };
 
 
   ngOnInit(): void {
     this.data = sampleData;
+
     this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Copy',
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
       { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
@@ -62,7 +67,8 @@ export class AppComponent implements OnInit {
     ];
 
   }
-  contextMenuClick(args: MenuEventArgs): void {
+
+  public contextMenuClick(args: MenuEventArgs): void {
 
     // Get
     if (args.item.id === 'delcolumn') {
@@ -79,16 +85,20 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'filter') {
       this.allowFiltering = !this.allowFiltering;
     }
+
     if (args.item.id === 'collapse') {
       this.enableCollapseAll = !this.enableCollapseAll;
     }
+
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
       this.styleDialog.show();
     }
+
     if (args.item.id === 'sort') {
       this.allowMultiSorting = !this.allowMultiSorting;
     }
+
     if (args.item.id === 'addcolumn') {
       this.field.nativeElement.value = '';
       this.align.nativeElement.value = '';
@@ -97,6 +107,7 @@ export class AppComponent implements OnInit {
       this.isEditOperation = false;
       this.Dialog.show();
     }
+
     if (args.item.id === 'editcolumn') {
       this.isEditOperation = true;
       this.align.nativeElement.value = args['column']['textAlign'] != null ? args['column']['textAlign'] : 'Left';
@@ -106,23 +117,15 @@ export class AppComponent implements OnInit {
       this.Dialog.show();
 
     }
+
     if (args.item.id === 'pastechild') {
-      this.editSettings.newRowPosition = "Child";
       let newData = this.getDataFromClipBoard();
-
+      this.editSettings.newRowPosition = "Child";
       setTimeout(() => {
-        let newObj = this.convertIntObj({ ...newData });
-        console.log(newObj);
-        this.grid.addRecord({ ...newObj }, args['rowInfo'].rowIndex);
-        // let a = this.grid.dataSource.slice().push({ ...newObj });
-        // this.grid.dataSource = a;
-        this.grid.refresh()
-      }
-        , 1000);
-
-      this.grid.addRecord(newData, args['rowInfo'].rowIndex);
-      //this.grid.refresh();
+        this.grid.addRecord({...newData}, args['rowInfo'].rowIndex);
+      }, 1000);
     }
+    
     if (args.item.id === 'paste') {
       this.editSettings.newRowPosition = "Below";
       let newData = this.getDataFromClipBoard();
@@ -135,6 +138,7 @@ export class AppComponent implements OnInit {
         , 1000);
     }
   }
+
   public addColumn = (): void => {
     let field = this.field.nativeElement.value;
     let headerText = this.headerText.nativeElement.value;
@@ -146,6 +150,7 @@ export class AppComponent implements OnInit {
     this.Dialog.hide();
 
   }
+
   public editColumn = (): void => {
     // let index = this.colIndex.nativeElement.value;
     let field = this.field.nativeElement.value;
@@ -171,6 +176,7 @@ export class AppComponent implements OnInit {
     this.grid.refreshColumns();
     this.styleDialog.hide();
   }
+
   public getDataFromClipBoard(): object {
 
     let myobj = {};
@@ -184,6 +190,7 @@ export class AppComponent implements OnInit {
 
     return myobj;
   }
+
   public getIndex(colName: string): number {
     let index = -1;
     this.grid.columns.forEach(function (arrayItem, key) {
@@ -193,7 +200,8 @@ export class AppComponent implements OnInit {
     });
     return index;
   }
-  public getColumns() {
+
+  public getColumns(): any {
     let columns = [];
     this.grid.columns.forEach(function (arrayItem, key) {
       columns.push(arrayItem['field']);
@@ -201,7 +209,7 @@ export class AppComponent implements OnInit {
     return columns;
   }
 
-  public convertIntObj(obj) {
+  public convertIntObj(obj): Object {
     const res = {}
     for (const key in obj) {
       const parsed = parseInt(obj[key]);
