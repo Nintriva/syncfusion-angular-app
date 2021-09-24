@@ -7,7 +7,7 @@ import * as faker from 'ng-faker';
 export let sampleData = [
 ];
 let j = 1;
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 300; i++) {
     let data = {
         taskID: j++,
         assignee: faker.name.firstName(),
