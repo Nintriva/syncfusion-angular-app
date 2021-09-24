@@ -9,8 +9,13 @@
   overflow: auto;
 }
 
+.form-horizontal .form-group {
+  margin-left: 0px !important;
+}
+
 .e-dialog .e-footer-content {
   padding: 20px 35px 20px 0px;
+  text-align: left !important;
 }
 
 div.e-movableheader>table {

@@ -1,10 +1,11 @@
 <div class="control-section">
-  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='allowMultiSorting'
-    [allowMultiSorting]='allowMultiSorting' childMapping='subtasks' [selectionSettings]='selectionOptions'
-    [allowSelection]='true' [treeColumnIndex]='1' [allowResizing]='allowResizing' [editSettings]='editSettings'
-    [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true' [contextMenuItems]="contextMenuItems"
-    [frozenRows]='frozenRow' [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)'
-    [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'>
+  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [allowTextWrap]='allowTextWrap'
+    [textWrapSettings]='wrapSettings' [allowMultiSorting]='allowMultiSorting' childMapping='subtasks'
+    [selectionSettings]='selectionOptions' [allowSelection]='true' [treeColumnIndex]='1' [allowResizing]='allowResizing'
+    [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true'
+    [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow' [frozenColumns]='frozenColumn'
+    (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'
+    [toolbar]='toolbarOptions'>
     <e-columns>
       <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right' isPrimaryKey='true'></e-column>
       <e-column field='assignee' headerText='Asignee' width='200'></e-column>
@@ -79,21 +80,28 @@
     <ng-template #footerTemplate>
       <div class="col-md-12 new-row">
         <div class="col-md-6"><label for="bgColor">Select background color:</label></div>
-        <div class="col-md-6"><input type="color" #bgColor id="bgColor" name="bgColor" value="#ffffff" class="fl"></div>
+        <div class="col-md-6"><input type="color" #bgColor id="bgColor" name="bgColor" value="#ffffff"
+            class="fl form-control"></div>
       </div>
       <div class="col-md-12 new-row">
         <div class="col-md-6"> <label for="color">Select font color:</label></div>
-        <div class="col-md-6"> <input type="color" id="color" #color name="color" value="#0000" class="fl"></div>
-      </div>
-      <div class="col-md-12 new-row">
-        <div class="col-md-6"> <label for="fontSize">Select font size:</label></div>
-        <div class="col-md-6"> <input type="fontSize" id="fontSize" #fontSize name="fontSizes" value="" class="fl">
+        <div class="col-md-6"> <input type="color" id="color" #color name="color" value="#0000" class="fl form-control">
         </div>
       </div>
       <div class="col-md-12 new-row">
-        <div class="col-md-6"> <label for="fontFamily">Select font color:</label></div>
-        <div class="col-md-6"> <input type="fontFamily" id="fontFamily" #fontFamily name="fontFamily" value=""
-            class="fl"></div>
+        <div class="col-md-6"> <label for="fontSize">Select font size:</label></div>
+        <div class="col-md-6"> <input type="fontSize" id="fontSize" #fontSize name="fontSizes" value=""
+            class="fl form-control" placeholder="eg 12px">
+        </div>
+      </div>
+      <div class="col-md-12 new-row">
+        <div class="col-md-6"> <label for="fontFamily">Select font Family:</label></div>
+        <div class="col-md-6">
+          <select id="fontFamily" #fontFamily name="fontFamily" value="" placeholder="eg. Times New Roman"
+            class="fl form-control">
+            <option *ngFor="let fonts of availableFonts">{{fonts}}</option>
+          </select>
+        </div>
       </div>
 
       <input type="hidden" value="" #colField>
