@@ -54,19 +54,14 @@
           </div>
         </fieldset>
       </form>
-
-
-
-
-
-
-
-      <button *ngIf="isEditOperation" id="sendButton" (click)="editColumn()"
-        class="e-control e-btn e-primary sendButton" data-ripple="true">Edit
-        column</button>
-      <button *ngIf="!isEditOperation" id="sendButton" (click)="addColumn()"
-        class="e-control e-btn e-primary sendButton" data-ripple="true">Add
-        column</button>
+      <div class="button-container">
+        <button *ngIf="isEditOperation" id="sendButton" (click)="editColumn()"
+          class="e-control e-btn e-primary sendButton" data-ripple="true">Edit
+          column</button>
+        <button *ngIf="!isEditOperation" id="sendButton" (click)="addColumn()"
+          class="e-control e-btn e-primary sendButton" data-ripple="true">Add
+          column</button>
+      </div>
     </ng-template>
     <ng-template #header>
 
@@ -105,11 +100,11 @@
       </div>
 
       <input type="hidden" value="" #colField>
-
-      <button id="sendButton" (click)="updateStyle()" class="new-row e-control e-btn e-primary sendButton"
-        data-ripple="true">Update
-        style</button>
-
+      <div class="button-container">
+        <button id="sendButton" (click)="updateStyle()" class="new-row e-control e-btn e-primary sendButton"
+          data-ripple="true">Update
+          style</button>
+      </div>
     </ng-template>
     <ng-template #header>
       <span>Edit style</span>

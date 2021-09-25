@@ -18,6 +18,27 @@
   text-align: left !important;
 }
 
+.e-dialog {
+  top: -100px !important;
+}
+
+.button-container {
+  text-align: center;
+
+}
+
+#dialog-container {
+  display: block;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.e-dlg-overlay {
+  position: fixed !important;
+}
+
 div.e-movableheader>table {
   width: 100% !important;
 }

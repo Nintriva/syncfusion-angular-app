@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   public showCloseIcon: Boolean = true;
   public height = '60vh';
   public target = '.control-section';
-  public animationSettings: AnimationSettingsModel = { effect: 'Zoom' };
+  public animationSettings: AnimationSettingsModel = { effect: 'FlipYLeft' };
   public width = '600px';
 
 
@@ -75,6 +75,7 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'delcolumn') {
       let column = this.grid.getColumnByField(args['column'].field);
       column.visible = false;
+      //this.grid.refresh();
       this.grid.refreshColumns();
     }
 
@@ -94,10 +95,7 @@ export class AppComponent implements OnInit {
       this.colField.nativeElement.value = args['column']['field'];
       this.styleDialog.show();
     }
-    if (args.item.id === 'wrap') {
-      this.grid.allowTextWrap = !this.grid.allowTextWrap;
-      this.grid.refresh();
-    }
+
     if (args.item.id === 'sort') {
       this.allowMultiSorting = !this.allowMultiSorting;
     }
