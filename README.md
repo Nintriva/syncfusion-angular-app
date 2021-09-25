@@ -20,11 +20,14 @@ Add; Del; Edit: Users can Add/Del/Edit columns, (also Drag-n-drop to Reorder & R
 
 Multi-Select On/Off: Enable users to multi-select rows on both PC and Mobile,
 
-
 Copy; Cut: Copy/Cut multi-selected rows - similar to how MS Windows File Explorer copy/cut Files (leaf rows) and Folders (non-leaf rows).
+
 (The rows being Copied/Cut shall be highlighted in color, but not removed yet, until user perform Paste)
+
 Paste as Sibling: Insert the copied/cut Rows as siblings of the current row
+
 Paste as Child: Insert the copied/cut Rows as children of the current row
+
 Add; Del; Edit: Users can Add/Del/"Dialog-Edit" rows in Row-Editing-Mode, (also Drag-n-drop to move multi-selected rows in TreeGrid).
 
 
