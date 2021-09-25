@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
-import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, GridComponent, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
+import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, ToolbarItems } from '@syncfusion/ej2-angular-treegrid';
 
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
@@ -96,11 +96,7 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'wrap') {
       this.grid.allowTextWrap = !this.grid.allowTextWrap;
-      alert(this.grid.allowTextWrap);
       this.grid.refresh();
-      // this.allowTextWrap = !this.allowTextWrap;
-      // alert(this.allowTextWrap);
-
     }
     if (args.item.id === 'sort') {
       this.allowMultiSorting = !this.allowMultiSorting;
