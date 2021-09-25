@@ -42,4 +42,3 @@ Add; Del; Edit: Users can Add/Del/"Dialog-Edit" rows in Row-Editing-Mode, (also 
 **** Also:
 Tech stack: Make full use of Syncfusion EJ2 Angular TreeGrid. Whatever Syncfusion does not support, you'll have to write code to implement.
 
-Any question regarding this test task, please feel free to ask us using Upwork message.
