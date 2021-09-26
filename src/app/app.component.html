@@ -1,7 +1,7 @@
 <div class="control-section">
   <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [allowTextWrap]='allowTextWrap'
     [textWrapSettings]='wrapSettings' [allowMultiSorting]='allowMultiSorting' childMapping='subtasks'
-    [selectionSettings]='selectionSettings' [allowSelection]='true' [treeColumnIndex]='1'
+    [selectionSettings]='selectionSettings' [allowSelection]='true' [treeColumnIndex]='1' [allowRowDragAndDrop]='true'
     [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll'
     [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
     [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'

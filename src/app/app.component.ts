@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
-import { TreeGridComponent, ToolbarItems } from '@syncfusion/ej2-angular-treegrid';
+import { TreeGridComponent, RowDDService, ToolbarItems } from '@syncfusion/ej2-angular-treegrid';
 
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
@@ -9,7 +9,7 @@ import { sampleData } from './data-source';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  providers: [SortService, ResizeService, PageService, EditService, ExcelExportService, FreezeService, PdfExportService, ContextMenuService]
+  providers: [RowDDService, SortService, ResizeService, PageService, EditService, ExcelExportService, FreezeService, PdfExportService, ContextMenuService]
 })
 export class AppComponent implements OnInit {
   @ViewChild('grid', { static: false }) public grid: TreeGridComponent;
