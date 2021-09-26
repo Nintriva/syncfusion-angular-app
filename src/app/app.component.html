@@ -1,11 +1,11 @@
 <div class="control-section">
   <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [allowTextWrap]='allowTextWrap'
     [textWrapSettings]='wrapSettings' [allowMultiSorting]='allowMultiSorting' childMapping='subtasks'
-    [selectionSettings]='selectionOptions' [allowSelection]='true' [treeColumnIndex]='1' [allowResizing]='allowResizing'
-    [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true'
-    [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow' [frozenColumns]='frozenColumn'
-    (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'
-    [toolbar]='toolbarOptions'>
+    [selectionSettings]='selectionSettings' [allowSelection]='true' [treeColumnIndex]='1'
+    [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll'
+    [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
+    [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
+    [allowReordering]='allowReordering' [toolbar]='toolbarOptions'>
     <e-columns>
       <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right' isPrimaryKey='true'></e-column>
       <e-column field='assignee' headerText='Asignee' width='200'></e-column>

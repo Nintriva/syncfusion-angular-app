@@ -24,7 +24,7 @@ for (let i = 0; i < 300; i++) {
         approved: false,
         subtasks: [
             {
-                taskID: j++, assignee: 'Plan timeline', email: faker.internet.email(),
+                taskID: j++, assignee: faker.name.firstName(), email: faker.internet.email(),
                 duration: faker.random.number({
                     'min': 0,
                     'max': 5
@@ -34,7 +34,7 @@ for (let i = 0; i < 300; i++) {
                 }), priority: 'Normal', approved: false
             },
             {
-                taskID: j++, assignee: 'Plan budget', email: faker.internet.email(),
+                taskID: j++, assignee: faker.name.firstName(), email: faker.internet.email(),
                 duration: faker.random.number({
                     'min': 0,
                     'max': 5
@@ -44,7 +44,7 @@ for (let i = 0; i < 300; i++) {
                 }), priority: 'Low', approved: true
             },
             {
-                taskID: j++, assignee: 'Allocate resources', email: faker.internet.email(),
+                taskID: j++, assignee: faker.name.firstName(), email: faker.internet.email(),
                 duration: faker.random.number({
                     'min': 0,
                     'max': 5

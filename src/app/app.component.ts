@@ -50,12 +50,14 @@ export class AppComponent implements OnInit {
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
 
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
-  public selectionOptions: { type: 'Multiple' };
+  public selectionSettings: Object;
 
 
   ngOnInit(): void {
     this.data = sampleData;
+    this.selectionSettings = { type: 'Multiple' };
     this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Copy',
+      { text: 'cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
       { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
       { text: 'Add Column', target: '.e-headercontent', id: 'addcolumn', iconCss: 'e-icons e-add-col' },
@@ -64,8 +66,8 @@ export class AppComponent implements OnInit {
       { text: 'Filter On/Off', target: '.e-headercontent', id: 'filter', iconCss: 'e-icons e-filter' },
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
-      { text: 'Paste', target: '.e-content', id: 'paste', iconCss: 'e-icons e-copy' },
-      { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-copy' }
+      { text: 'Paste', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
+      { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' }
     ];
 
   }
@@ -87,6 +89,10 @@ export class AppComponent implements OnInit {
 
     if (args.item.id === 'filter') {
       this.allowFiltering = !this.allowFiltering;
+    }
+    if (args.item.id === 'cut') {
+      this.grid.copy();
+      this.grid.deleteRecord();
     }
     if (args.item.id === 'collapse') {
       this.enableCollapseAll = !this.enableCollapseAll;
@@ -130,7 +136,9 @@ export class AppComponent implements OnInit {
     let newData = this.getDataFromClipBoard();
     setTimeout(() => {
       let newObj = this.convertIntObj(newData);
-      this.grid.addRecord({ ...newObj }, index);
+      newObj.forEach((x, num) => {
+        this.grid.addRecord({ ...x }, index);
+      });
       this.refresh();
     }
       , 1000);
@@ -174,18 +182,26 @@ export class AppComponent implements OnInit {
     this.grid.refreshColumns();
     this.styleDialog.hide();
   }
-  public getDataFromClipBoard(): object {
-
+  public getDataFromClipBoard(): any {
+    let arr = [];
     let myobj = {};
     navigator['clipboard'].readText().then((data) => {
       let lines = data.split('\n');
-      let req = lines.pop().split('\t')
-      var output = this.getColumns().map(function (obj, index) {
-        myobj[obj] = req[index];
+      // let req = lines.pop().split('\t')
+      lines.forEach((key, value) => {
+        let myobj = {};
+        let req = key.split('\t');
+        if (value > 0) {
+          var output = this.getColumns().map(function (obj, index) {
+            myobj[obj] = req[index];
+          });
+          arr.push(myobj);
+        }
       });
-    });
 
-    return myobj;
+    });
+    if (arr)
+      return arr;
   }
   public getIndex(colName: string): number {
     let index = -1;
@@ -205,12 +221,17 @@ export class AppComponent implements OnInit {
   }
 
   public convertIntObj(obj) {
-    const res = {}
+
+    const mainObj = []
     for (const key in obj) {
-      const parsed = parseInt(obj[key]);
-      res[key] = isNaN(parsed) ? obj[key] : parsed;
+      const res = {}
+      for (const ikey in obj[key]) {
+        const parsed = parseInt(obj[key][ikey]);
+        res[ikey] = isNaN(parsed) ? obj[key][ikey] : parsed;
+      }
+      mainObj.push(res);
     }
-    return res;
+    return mainObj;
   }
   public refresh() {
     setTimeout(() => this.grid.refresh(), 500);

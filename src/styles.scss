@@ -80,6 +80,14 @@ td.e-rowcell {
   content: '\ea99';
 }
 
+.e-cut:before {
+  content: '\e279';
+}
+
+.e-paste:before {
+  content: '\e501';
+}
+
 
 .e-sort:before {
   content: '\e890';
