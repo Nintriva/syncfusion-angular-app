@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, RowDDService, ToolbarItems } from '@syncfusion/ej2-angular-treegrid';
-
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
@@ -35,12 +34,12 @@ export class AppComponent implements OnInit {
   public data: Object[];
   public contextMenuItems: any;
   public editing: EditSettingsModel;
-  public wrapSettings: TextWrapSettingsModel = { wrapMode: 'Content' };;
+  public wrapSettings: TextWrapSettingsModel;
   public allowMultiSorting: boolean = false;
   public enableCollapseAll: boolean = false;
   public allowFiltering: boolean = false;
   public allowResizing: boolean = true;
-  public allowTextWrap: boolean = true;
+  public allowTextWrap: boolean;
   public allowReordering: boolean = true;
   public isFreezed: boolean = false;
   public isEditOperation: boolean = false;
@@ -56,7 +55,10 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.data = sampleData;
     this.selectionSettings = { type: 'Multiple' };
-    this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Copy',
+    this.allowTextWrap = false;
+    this.wrapSettings = { wrapMode: 'Both' };
+    this.contextMenuItems = ['Edit', 'Delete', 'Save',
+      { text: 'copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
       { text: 'cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
       { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
@@ -65,9 +67,12 @@ export class AppComponent implements OnInit {
       { text: 'Del Column', target: '.e-headercontent', id: 'delcolumn', iconCss: 'e-icons e-del-col' },
       { text: 'Filter On/Off', target: '.e-headercontent', id: 'filter', iconCss: 'e-icons e-filter' },
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
+      { text: 'Multi-Select On/Off', target: '.e-content', id: 'multiselect', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
       { text: 'Paste', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
-      { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' }
+      { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
+      { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
+
     ];
 
   }
@@ -86,9 +91,29 @@ export class AppComponent implements OnInit {
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
 
     }
+    if (args.item.id === 'multiselect') {
+      let settings = this.grid.selectionSettings;
+      settings.type === 'Single' ? settings.type = 'Multiple' : settings.type = 'Single';
+      this.grid.refresh();
+    }
+    if (args.item.id === 'wrap') {
+      let settings = this.grid.textWrapSettings;
+      settings.wrapMode = settings.wrapMode == 'Content' ? 'Both' : 'Content';
+      this.grid.allowTextWrap = !this.grid.allowTextWrap;
+      this.grid.refresh();
+    }
 
     if (args.item.id === 'filter') {
       this.allowFiltering = !this.allowFiltering;
+    }
+    if (args.item.id === 'copy') {
+      let selectedItems = this.grid.getSelectedRowIndexes();
+      for (let i in selectedItems) {
+        this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
+          a.style.background = 'aquamarine';
+        });
+      }
+      this.grid.copy();
     }
     if (args.item.id === 'cut') {
       this.grid.copy();
@@ -141,7 +166,7 @@ export class AppComponent implements OnInit {
       });
       this.refresh();
     }
-      , 1000);
+      , 200);
   }
 
   public addColumn = (): void => {
@@ -234,7 +259,7 @@ export class AppComponent implements OnInit {
     return mainObj;
   }
   public refresh() {
-    setTimeout(() => this.grid.refresh(), 500);
+    setTimeout(() => this.grid.refresh(), 100);
   }
 
 }
