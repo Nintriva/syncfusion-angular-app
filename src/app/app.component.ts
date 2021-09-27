@@ -120,12 +120,12 @@ export class AppComponent implements OnInit {
     }
 
     if (args.item.id === 'pastechild') {
-      this.editSettings.newRowPosition = "Child";
+      this.grid.editSettings.newRowPosition = "Child";
       this.pasteContent(args['rowInfo'].rowIndex);
     }
     
     if (args.item.id === 'paste') {
-      this.editSettings.newRowPosition = "Below";
+      this.grid.editSettings.newRowPosition = "Below";
       this.pasteContent(args['rowInfo'].rowIndex);
     }
 
