@@ -135,7 +135,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       let newObj = this.convertIntObj(newData);
       this.grid.addRecord({ ...newObj }, index);
-      // this.refresh();
+      this.refresh();
     }
       , 1000);
   }
@@ -217,6 +217,10 @@ export class AppComponent implements OnInit {
       res[key] = isNaN(parsed) ? obj[key] : parsed;
     }
     return res;
+  }
+
+  public refresh() {
+    setTimeout(() => this.grid.refresh(), 500);
   }
 
 }
