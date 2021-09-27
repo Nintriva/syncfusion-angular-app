@@ -63,7 +63,7 @@ export class AppComponent implements OnInit {
       { text: 'Filter On/Off', target: '.e-headercontent', id: 'filter', iconCss: 'e-icons e-filter' },
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
-      { text: 'Paste as sibbiling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-copy' },
+      { text: 'Paste', target: '.e-content', id: 'paste', iconCss: 'e-icons e-copy' },
       { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-copy' }
     ];
 
