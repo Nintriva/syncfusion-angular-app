@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
   public isEditOperation: boolean = false;
   public frozenRow: number = 0;
   public frozenColumn: number = 0;
-  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: 'Child'};
+  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: 'Below'};
   public selectionOptions: { type: 'Multiple' };
 
 
@@ -121,21 +121,13 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'pastechild') {
       let newData = this.getDataFromClipBoard();
       this.editSettings.newRowPosition = "Child";
-      setTimeout(() => {
-        this.grid.addRecord({...newData}, args['rowInfo'].rowIndex);
-      }, 1000);
+      this.grid.addRecord({...newData}, args['rowInfo'].rowIndex);
     }
     
     if (args.item.id === 'paste') {
       this.editSettings.newRowPosition = "Below";
       let newData = this.getDataFromClipBoard();
-      console.log(newData);
-      setTimeout(() => {
-        let newObj = this.convertIntObj(newData);
-        this.grid.addRecord(newObj, args['rowInfo'].rowIndex);
-        // this.grid.refresh()
-      }
-        , 1000);
+      this.grid.addRecord(newData, args['rowInfo'].rowIndex);
     }
   }
 
