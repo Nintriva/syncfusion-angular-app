@@ -5,6 +5,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
 
 import { sampleData } from './data-source';
+import { TreeGridComponent } from '@syncfusion/ej2-angular-treegrid';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ import { sampleData } from './data-source';
 
 export class AppComponent implements OnInit {
 
-  @ViewChild('grid') public grid: GridComponent;
+  @ViewChild('grid', {static: false}) public grid: TreeGridComponent;
   @ViewChild('template') public Dialog: DialogComponent;
   @ViewChild('styleDialog') public styleDialog: DialogComponent;
   @ViewChild('field') public field: ElementRef;
