@@ -120,13 +120,24 @@ export class AppComponent implements OnInit {
 
     if (args.item.id === 'pastechild') {
       this.editSettings.newRowPosition = "Child";
-      this.grid.addRecord(args['rowInfo'].rowIndex);
+      this.pasteContent(args['rowInfo'].rowIndex);
     }
     
     if (args.item.id === 'paste') {
       this.editSettings.newRowPosition = "Below";
-      this.grid.addRecord(args['rowInfo'].rowIndex);
+      this.pasteContent(args['rowInfo'].rowIndex);
     }
+
+  }
+
+  public pasteContent(index: number) {
+    let newData = this.getDataFromClipBoard();
+    setTimeout(() => {
+      let newObj = this.convertIntObj(newData);
+      this.grid.addRecord({ ...newObj }, index);
+      // this.refresh();
+    }
+      , 1000);
   }
 
   public addColumn = (): void => {
