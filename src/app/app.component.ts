@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
   public isEditOperation: boolean = false;
   public frozenRow: number = 0;
   public frozenColumn: number = 0;
-  public toolbarOptions: ToolbarItems[] = ['Add', 'Edit', 'Cancel', 'Update'];
+  public toolbarOptions: ToolbarItems[] = [];
   public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/mm/dd', 'date-dd/mm/yyyy'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
@@ -186,7 +186,6 @@ export class AppComponent implements OnInit {
     let textAlign = this.align.nativeElement.value;
     let dataType = this.dataType.nativeElement.value;
     let newData = dataType.split('-');
-    console.log(newData);
     let rowDetails: any = { field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
     rowDetails['format'] = newData[1] ? newData[1] : '';
@@ -249,7 +248,6 @@ export class AppComponent implements OnInit {
           arr.push(myobj);
         }
       });
-
     });
     if (arr)
       return arr;
@@ -272,7 +270,6 @@ export class AppComponent implements OnInit {
   }
 
   public convertIntObj(obj) {
-
     const mainObj = []
     for (const key in obj) {
       const res = {}
