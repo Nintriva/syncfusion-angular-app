@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
   public assigneeRule: object;
 
   public toolbarOptions: ToolbarItems[] = [];
-  public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/mm/dd', 'date-dd/mm/yyyy'];
+  public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/MM/dd', 'date-dd/MM/yyyy'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
   public selectionSettings: Object;
