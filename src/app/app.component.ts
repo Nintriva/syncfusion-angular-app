@@ -197,12 +197,13 @@ export class AppComponent implements OnInit {
     if (this.grid.columns.push(rowDetails)) {
       this.grid.refreshColumns();
       this.data.forEach((a) => {
-        a[field] = defaultValue;
+        a[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
         a['subtasks'].forEach((b) => {
-          b[field] = defaultValue;
+          b[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
         });
       });
       this.grid.dataSource = this.data;
+      this.grid.refresh();
       this.Dialog.hide();
     }
 
