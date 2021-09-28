@@ -7,7 +7,8 @@
     [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
     [allowReordering]='allowReordering'>
     <e-columns>
-      <e-column field='taskID' headerText='Task ID' width='70' textAlign='Right' isPrimaryKey='true'></e-column>
+      <e-column field='taskID' headerText='Task ID' [validationRules]='taskidRule' width='70' textAlign='Right'
+        isPrimaryKey='true'></e-column>
       <e-column field='assignee' headerText='Asignee' width='200'></e-column>
       <e-column field='email' headerText='Email' width='90' textAlign='Right'></e-column>
 

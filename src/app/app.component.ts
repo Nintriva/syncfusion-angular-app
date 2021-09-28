@@ -47,6 +47,7 @@ export class AppComponent implements OnInit {
   public isEditOperation: boolean = false;
   public frozenRow: number = 0;
   public frozenColumn: number = 0;
+  public taskidRule: object;
   public toolbarOptions: ToolbarItems[] = [];
   public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/mm/dd', 'date-dd/mm/yyyy'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
@@ -57,6 +58,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.data = sampleData;
     this.index = (this.data.length * 4) + 1;
+    this.taskidRule = { required: true, number: true };
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
