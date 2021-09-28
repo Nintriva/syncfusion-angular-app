@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   @ViewChild('colField') public colField: ElementRef;
   @ViewChild('fontSize') public fontSize: ElementRef;
   @ViewChild('fontFamily') public fontFamily: ElementRef;
+  @ViewChild('dataType') public dataType: ElementRef;
 
   public showCloseIcon: Boolean = true;
   public height = '60vh';
@@ -45,9 +46,9 @@ export class AppComponent implements OnInit {
   public isEditOperation: boolean = false;
   public frozenRow: number = 0;
   public frozenColumn: number = 0;
-  public toolbarOptions: ToolbarItems[] = ['Add'];
+  public toolbarOptions: ToolbarItems[] = ['Add', 'Edit', 'Cancel', 'Update'];
+  public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/mm/dd', 'date-dd/mm/yyyy'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
-
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
   public selectionSettings: Object;
 
@@ -58,8 +59,9 @@ export class AppComponent implements OnInit {
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
     this.contextMenuItems = ['Edit', 'Delete', 'Save',
-      { text: 'copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
-      { text: 'cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
+      { text: 'Add Record', target: '.e-content', id: 'add', iconCss: 'e-icons e-add' },
+      { text: 'Copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
+      { text: 'Cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
       { text: 'Freeze On/Off', target: '.e-headercontent', id: 'freezecolumn', iconCss: 'e-icons e-freeze' },
       { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
       { text: 'Add Column', target: '.e-headercontent', id: 'addcolumn', iconCss: 'e-icons e-add-col' },
@@ -77,8 +79,6 @@ export class AppComponent implements OnInit {
 
   }
   contextMenuClick(args: MenuEventArgs): void {
-
-    // Get
     if (args.item.id === 'delcolumn') {
       let column = this.grid.getColumnByField(args['column'].field);
       column.visible = false;
@@ -90,6 +90,9 @@ export class AppComponent implements OnInit {
       let column = this.grid.getColumnByField(args['column'].field);
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
 
+    }
+    if (args.item.id === 'add') {
+      this.grid.addRecord();
     }
     if (args.item.id === 'multiselect') {
       let settings = this.grid.selectionSettings;
@@ -118,6 +121,7 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'cut') {
       this.grid.copy();
       this.grid.deleteRecord();
+
     }
     if (args.item.id === 'collapse') {
       this.enableCollapseAll = !this.enableCollapseAll;
@@ -135,6 +139,7 @@ export class AppComponent implements OnInit {
       this.align.nativeElement.value = '';
       this.defaultValue.nativeElement.value = '';
       this.headerText.nativeElement.value = '';
+      this.dataType.nativeElement.value = '';
       this.isEditOperation = false;
       this.Dialog.show();
     }
@@ -144,8 +149,10 @@ export class AppComponent implements OnInit {
       this.defaultValue.nativeElement.value = args['column']['defaultValue'] != undefined ? args['column']['defaultValue'] : '';
       this.field.nativeElement.value = args['column']['field'];
       this.headerText.nativeElement.value = args['column']['headerText'];
+      let obj = args['column'];
+      let elem = obj['format'] ? obj['type'].concat('-', obj['format']) : obj['type'];
+      this.dataType.nativeElement.value = elem;
       this.Dialog.show();
-
     }
     if (args.item.id === 'pastechild') {
       this.grid.editSettings.newRowPosition = "Child";
@@ -174,9 +181,22 @@ export class AppComponent implements OnInit {
     let headerText = this.headerText.nativeElement.value;
     let defaultValue = this.defaultValue.nativeElement.value;
     let textAlign = this.align.nativeElement.value;
+    let dataType = this.dataType.nativeElement.value;
+    let newData = dataType.split('-');
+    console.log(newData);
     let rowDetails: any = { field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
+    rowDetails['type'] = newData[0] ? newData[0] : 'string';
+    rowDetails['format'] = newData[1] ? newData[1] : '';
     this.grid.columns.push(rowDetails);
     this.grid.refreshColumns();
+    this.data.forEach((a) => {
+      a[field] = defaultValue;
+      a['subtasks'].forEach((b) => {
+        b[field] = defaultValue;
+      });
+    });
+    this.grid.dataSource = this.data;
+    this.grid.refresh();
     this.Dialog.hide();
 
   }
@@ -187,6 +207,11 @@ export class AppComponent implements OnInit {
     this.grid.getColumnByField(field).field = this.field.nativeElement.value;
     this.grid.getColumnByField(field).textAlign = this.align.nativeElement.value;
     this.grid.getColumnByField(field).defaultValue = this.defaultValue.nativeElement.value;
+    let format = this.dataType.nativeElement.value;
+    let newData = format.split('-');
+    this.grid.getColumnByField(field).type = newData[0];
+    this.grid.getColumnByField(field).format = newData[1];
+
     this.grid.refreshColumns();
     this.Dialog.hide();
 
@@ -258,6 +283,7 @@ export class AppComponent implements OnInit {
     }
     return mainObj;
   }
+
   public refresh() {
     setTimeout(() => this.grid.refresh(), 100);
   }
