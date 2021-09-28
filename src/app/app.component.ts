@@ -203,7 +203,6 @@ export class AppComponent implements OnInit {
         });
       });
       this.grid.dataSource = this.data;
-      this.grid.refresh();
       this.Dialog.hide();
     }
 
