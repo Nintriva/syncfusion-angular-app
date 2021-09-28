@@ -9,7 +9,7 @@
     <e-columns>
       <e-column field='taskID' headerText='Task ID' [validationRules]='taskidRule' width='70' textAlign='Right'
         isPrimaryKey='true'></e-column>
-      <e-column field='assignee' headerText='Asignee' width='200'></e-column>
+      <e-column field='assignee' headerText='Asignee' width='200' [validationRules]='assigneeRule'></e-column>
       <e-column field='email' headerText='Email' width='90' textAlign='Right'></e-column>
 
       <e-column field='duration' headerText='Duration' width='80' textAlign='Right'></e-column>
@@ -25,10 +25,11 @@
         <div class="form-group">
           <label class="col-sm-3 control-label">Field Name</label>
           <div class="col-sm-9">
-            <input id="field" #field type="text" placeholder="Enter field name" class="form-control" />
+            <input id="field" #field type="text" placeholder="Enter field name" class="form-control"
+              [disabled]="isEditOperation" />
           </div>
         </div>
-        <div class="form-group">
+        <div class=" form-group">
           <label for="disabledInput" class="col-sm-3 control-label">Header Text</label>
           <div class="col-sm-9">
             <input id="headerText" #headerText type="text" placeholder="Enter header text" class="form-control" />
