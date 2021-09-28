@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
-    this.contextMenuItems = ['Edit', 'Delete', 'Save',
+    this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Cancel',
       { text: 'Add Record', target: '.e-content', id: 'add', iconCss: 'e-icons e-add' },
       { text: 'Copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
       { text: 'Cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
