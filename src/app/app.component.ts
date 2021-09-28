@@ -194,17 +194,18 @@ export class AppComponent implements OnInit {
     let rowDetails: any = { field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
     rowDetails['format'] = newData[1] ? newData[1] : '';
-    this.grid.columns.push(rowDetails);
-    this.grid.refreshColumns();
-    this.data.forEach((a) => {
-      a[field] = defaultValue;
-      a['subtasks'].forEach((b) => {
-        b[field] = defaultValue;
+    if (this.grid.columns.push(rowDetails)) {
+      this.grid.refreshColumns();
+      this.data.forEach((a) => {
+        a[field] = defaultValue;
+        a['subtasks'].forEach((b) => {
+          b[field] = defaultValue;
+        });
       });
-    });
-    this.grid.dataSource = this.data;
-    this.grid.refresh();
-    this.Dialog.hide();
+      this.grid.dataSource = this.data;
+      this.grid.refresh();
+      this.Dialog.hide();
+    }
 
   }
   public editColumn = (): void => {
