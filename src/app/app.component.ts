@@ -33,6 +33,7 @@ export class AppComponent implements OnInit {
 
 
   public data: Object[];
+  public index: number;
   public contextMenuItems: any;
   public editing: EditSettingsModel;
   public wrapSettings: TextWrapSettingsModel;
@@ -55,6 +56,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = sampleData;
+    this.index = (this.data.length * 4) + 1;
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
@@ -71,7 +73,7 @@ export class AppComponent implements OnInit {
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
       { text: 'Multi-Select On/Off', target: '.e-content', id: 'multiselect', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
-      { text: 'Paste', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
+      { text: 'Paste as sibling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
       { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
       { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
 
@@ -169,6 +171,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       let newObj = this.convertIntObj(newData);
       newObj.forEach((x, num) => {
+        x['taskID'] = this.index++;
         this.grid.addRecord({ ...x }, index);
       });
       this.refresh();
@@ -211,10 +214,8 @@ export class AppComponent implements OnInit {
     let newData = format.split('-');
     this.grid.getColumnByField(field).type = newData[0];
     this.grid.getColumnByField(field).format = newData[1];
-
     this.grid.refreshColumns();
     this.Dialog.hide();
-
   }
 
   public updateStyle = (): void => {
