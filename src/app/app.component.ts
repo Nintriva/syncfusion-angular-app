@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
-import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
+import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService, BooleanEditCell } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
@@ -35,6 +35,8 @@ export class AppComponent implements OnInit {
 
   public data: Object[];
   public index: number;
+  public showBoolean: boolean;
+  public selectedIndex: any;
   public contextMenuItems: any;
   public editing: EditSettingsModel;
   public wrapSettings: TextWrapSettingsModel;
@@ -51,14 +53,20 @@ export class AppComponent implements OnInit {
   public taskidRule: object;
   public assigneeRule: object;
   public toolbarOptions: ToolbarItems[];
-  public availableDataTypes: string[] = ['string', 'dropDownList', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/MM/dd'];
+  public availableDataTypes: string[] = ['string', 'boolean', 'dropDownList', 'number', 'date'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
   public selectionSettings: Object;
   public copiedData: any;
+  public operation: string;
+  public editTypeColumns: object = { 'boolean': 'booleanedit', 'dropDownList': 'dropdownedit', 'number': 'numericedit', 'string': 'defaultedit', 'date': 'datepickeredit' };
+
+  // public ddParams: object;
 
   ngOnInit(): void {
     this.data = sampleData;
+    //   this.ddParams = { params: { value: 'Germany' } };
+    this.showBoolean = false;
     this.index = (this.data.length * 4) + 1;
     this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
@@ -130,17 +138,22 @@ export class AppComponent implements OnInit {
       this.allowFiltering = !this.allowFiltering;
     }
     if (args.item.id === 'copy') {
+      this.operation = 'copy';
       let selectedItems = this.grid.getSelectedRowIndexes();
       for (let i in selectedItems) {
         this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
-          a.style.background = 'aquamarine';
+          a.style.background = 'lightpink';
         });
       }
-      console.log(args['rowInfo']['rowData']);
+
       this.copiedData = args['rowInfo']['rowData'];
+
       this.grid.copy();
     }
     if (args.item.id === 'cut') {
+      this.operation = 'cut';
+      this.selectedIndex = this.grid.getSelectedRowIndexes();
+      this.copiedData = args['rowInfo']['rowData'];
       this.grid.copy();
       this.grid.deleteRecord();
 
@@ -189,18 +202,41 @@ export class AppComponent implements OnInit {
     }
   }
   public pasteContent(index: number) {
-    let newData = this.getDataFromClipBoard();
-    setTimeout(() => {
-      let newObj = this.convertIntObj(newData);
-      newObj.forEach((x, num) => {
-        x['taskID'] = this.index++;
-        this.grid.addRecord({ ...x }, index);
-      });
-      this.refresh();
-    }
-      , 200);
-  }
+    // let newData = this.getDataFromClipBoard();
+    // setTimeout(() => {
+    //   let newObj = this.convertIntObj(newData);
+    //   newObj.forEach((x, num) => {
+    //     x['taskID'] = this.index++;
+    //     this.grid.addRecord({ ...x }, index);
+    //   });
+    //   this.refresh();
+    // }
+    //   , 200);
 
+    let newData = this.copiedData;
+    // newData.forEach(element => {
+
+    //   //;
+    // });
+    this.grid.addRecord({ ...newData }, index)
+    //this.refresh();
+    // if (this.operation == 'cut') {
+    //   this.selectedIndex.forEach(element => {
+    //     this.grid.selectRow(element);
+    //     this.grid.deleteRecord();
+
+    //   });
+    //   this.refresh();
+
+    // }
+  }
+  public changeType = (): any => {
+    if (this.dataType.nativeElement.value == 'boolean') {
+      this.showBoolean = true;
+    } else {
+      this.showBoolean = false;
+    }
+  }
   public addColumn = (): void => {
     let field = this.field.nativeElement.value;
     let headerText = this.headerText.nativeElement.value;
@@ -208,8 +244,9 @@ export class AppComponent implements OnInit {
     let textAlign = this.align.nativeElement.value;
     let dataType = this.dataType.nativeElement.value;
     let minWidth = this.minWidth.nativeElement.value;
+    let editType = this.editTypeColumns[dataType];
     let newData = dataType.split('-');
-    let rowDetails: any = { minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
+    let rowDetails: any = { width: 100, minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign, editType: editType };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
     rowDetails['format'] = newData[1] ? newData[1] : '';
     if (this.grid.columns.push(rowDetails)) {
@@ -223,24 +260,36 @@ export class AppComponent implements OnInit {
       this.grid.dataSource = this.data;
       this.grid.refresh();
       this.Dialog.hide();
+      console.log(this.grid.columns);
+
     }
 
   }
+
   public editColumn = (): void => {
     // let index = this.colIndex.nativeElement.value;
-    let field = this.field.nativeElement.value;
-    this.grid.getColumnByField(field).headerText = this.headerText.nativeElement.value;
-    this.grid.getColumnByField(field).field = this.field.nativeElement.value;
-    this.grid.getColumnByField(field).textAlign = this.align.nativeElement.value;
-    this.grid.getColumnByField(field).defaultValue = this.defaultValue.nativeElement.value;
-    this.grid.getColumnByField(field).minWidth = this.minWidth.nativeElement.value;
+    if (this.validateUpdate()) {
+      let field = this.field.nativeElement.value;
+      this.grid.getColumnByField(field).headerText = this.headerText.nativeElement.value;
+      this.grid.getColumnByField(field).field = this.field.nativeElement.value;
+      this.grid.getColumnByField(field).textAlign = this.align.nativeElement.value;
+      this.grid.getColumnByField(field).defaultValue = this.defaultValue.nativeElement.value;
+      this.grid.getColumnByField(field).minWidth = this.minWidth.nativeElement.value;
 
-    let format = this.dataType.nativeElement.value;
-    let newData = format.split('-');
-    this.grid.getColumnByField(field).type = newData[0];
-    this.grid.getColumnByField(field).format = newData[1];
-    this.grid.refreshColumns();
-    this.Dialog.hide();
+      let format = this.dataType.nativeElement.value;
+      let newData = format.split('-');
+      this.grid.getColumnByField(field).type = newData[0];
+
+      this.grid.getColumnByField(field).editType = this.editTypeColumns[newData[0]];
+      // if (newData[0] == 'boolean' || newData[0] == 'numeric') {
+      //   this.grid.getColumnByField(field).format = 'N1';
+      // }
+      this.grid.refreshColumns();
+      //this.grid.refresh();
+      this.Dialog.hide();
+    } else {
+      alert("column contains item that are not in this datatype.")
+    }
   }
 
   public updateStyle = (): void => {
@@ -294,6 +343,13 @@ export class AppComponent implements OnInit {
     });
     return columns;
   }
+  public getRowByIndex(index: number) {
+    this.data.forEach((element) => {
+      if (element['taskID'] == index) {
+        return element;
+      }
+    })
+  }
 
   public convertIntObj(obj) {
     const mainObj = []
@@ -307,10 +363,37 @@ export class AppComponent implements OnInit {
     }
     return mainObj;
   }
+  public validateUpdate = (): boolean => {
 
+    let is_valid = true;
+    let dataType = this.dataType.nativeElement.value;
+    let column = this.field.nativeElement.value;
+    this.data.forEach(element => {
+      if (dataType == 'boolean') {
+        if (element[column].toString() != "true" && element[column] != "false") {
+          is_valid = false;
+        }
+      }
+      if (dataType == 'number') {
+        console.log(parseInt(element[column]))
+        if (isNaN(parseInt(element[column]))) {
+          is_valid = false;
+        }
+      }
+      if (dataType == 'date') {
+        if (element[column].toString() == 'true' || element[column].toString() == 'false') {
+          is_valid = false;
+        }
+      }
+    });
+
+    return is_valid;
+  }
+  public beginEdit(l) {
+  }
   public refresh() {
 
-    setTimeout(() => this.grid.refresh(), 100);
+    setTimeout(() => this.grid.refresh(), 1000);
   }
   actionComplete($event) {
     //if ($event['action'] == 'Add') {
