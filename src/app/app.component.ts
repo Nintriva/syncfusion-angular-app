@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService } from '@syncfusion/ej2-angular-grids';
-import { TreeGridComponent, RowDDService, ToolbarItems } from '@syncfusion/ej2-angular-treegrid';
+import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
-import { EditSettingsModel } from '@syncfusion/ej2-angular-grids';
+import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
+import { exit } from 'process';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit {
   @ViewChild('fontSize') public fontSize: ElementRef;
   @ViewChild('fontFamily') public fontFamily: ElementRef;
   @ViewChild('dataType') public dataType: ElementRef;
-
+  @ViewChild('minWidth') public minWidth: ElementRef;
   public showCloseIcon: Boolean = true;
   public height = '60vh';
   public target = '.control-section';
@@ -49,19 +50,20 @@ export class AppComponent implements OnInit {
   public frozenColumn: number = 0;
   public taskidRule: object;
   public assigneeRule: object;
-
-  public toolbarOptions: ToolbarItems[] = [];
-  public availableDataTypes: string[] = ['string', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/MM/dd'];
+  public toolbarOptions: ToolbarItems[];
+  public availableDataTypes: string[] = ['string', 'dropDownList', 'number-N1', 'number-N2', 'number-C1', 'number-C2', 'date-yyyy/MM/dd'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
   public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
   public selectionSettings: Object;
-
+  public copiedData: any;
 
   ngOnInit(): void {
     this.data = sampleData;
     this.index = (this.data.length * 4) + 1;
+    this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
-    this.taskidRule = { required: true, number: true };
+    this.taskidRule = { required: true, number: true, value: [this.customFn, 'Enter a unique value'] };
+
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
@@ -84,6 +86,18 @@ export class AppComponent implements OnInit {
 
     ];
 
+  }
+  public customFn = (args): boolean => {
+    return true;
+    // let count = 0;
+    // for (let i = 0; i < this.data.length; i++) {
+    //   if (args['value'].toString() === this.grid.dataSource[i]['taskID'].toString()) {
+    //     count++;
+    //   }
+    // }
+    // let ret = count > 0 ? false : true;
+    // return ret;
+    // exit;
   }
   contextMenuClick(args: MenuEventArgs): void {
     if (args.item.id === 'delcolumn') {
@@ -122,6 +136,8 @@ export class AppComponent implements OnInit {
           a.style.background = 'aquamarine';
         });
       }
+      console.log(args['rowInfo']['rowData']);
+      this.copiedData = args['rowInfo']['rowData'];
       this.grid.copy();
     }
     if (args.item.id === 'cut') {
@@ -146,6 +162,7 @@ export class AppComponent implements OnInit {
       this.defaultValue.nativeElement.value = '';
       this.headerText.nativeElement.value = '';
       this.dataType.nativeElement.value = '';
+      this.minWidth.nativeElement.value = '';
       this.isEditOperation = false;
       this.Dialog.show();
     }
@@ -155,6 +172,7 @@ export class AppComponent implements OnInit {
       this.defaultValue.nativeElement.value = args['column']['defaultValue'] != undefined ? args['column']['defaultValue'] : '';
       this.field.nativeElement.value = args['column']['field'];
       this.headerText.nativeElement.value = args['column']['headerText'];
+      this.minWidth.nativeElement.value = args['column']['minWidth'];
       let obj = args['column'];
       let elem = obj['format'] ? obj['type'].concat('-', obj['format']) : obj['type'];
       this.dataType.nativeElement.value = elem;
@@ -189,8 +207,9 @@ export class AppComponent implements OnInit {
     let defaultValue = this.defaultValue.nativeElement.value;
     let textAlign = this.align.nativeElement.value;
     let dataType = this.dataType.nativeElement.value;
+    let minWidth = this.minWidth.nativeElement.value;
     let newData = dataType.split('-');
-    let rowDetails: any = { field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
+    let rowDetails: any = { minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
     rowDetails['format'] = newData[1] ? newData[1] : '';
     if (this.grid.columns.push(rowDetails)) {
@@ -214,6 +233,8 @@ export class AppComponent implements OnInit {
     this.grid.getColumnByField(field).field = this.field.nativeElement.value;
     this.grid.getColumnByField(field).textAlign = this.align.nativeElement.value;
     this.grid.getColumnByField(field).defaultValue = this.defaultValue.nativeElement.value;
+    this.grid.getColumnByField(field).minWidth = this.minWidth.nativeElement.value;
+
     let format = this.dataType.nativeElement.value;
     let newData = format.split('-');
     this.grid.getColumnByField(field).type = newData[0];
@@ -288,7 +309,14 @@ export class AppComponent implements OnInit {
   }
 
   public refresh() {
+
     setTimeout(() => this.grid.refresh(), 100);
+  }
+  actionComplete($event) {
+    //if ($event['action'] == 'Add') {
+
+    //  this.refresh();
+    //  }
   }
 
 }
