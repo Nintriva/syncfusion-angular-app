@@ -1,12 +1,12 @@
 <div class="control-section">
   <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [textWrapSettings]='wrapSettings'
     [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap' [allowMultiSorting]='allowMultiSorting'
-    childMapping='subtasks' (actionComplete)="actionComplete($event)" [selectionSettings]='selectionSettings'
-    [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1' [allowRowDragAndDrop]='true'
-    [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll'
-    [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
-    [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
-    [allowReordering]='allowReordering'>
+    childMapping='subtasks' (actionComplete)="actionComplete($event)" (actionBegin)="actionBegin($event)"
+    [selectionSettings]='selectionSettings' [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1'
+    [allowRowDragAndDrop]='true' [allowResizing]='allowResizing' [editSettings]='editSettings'
+    [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true' [contextMenuItems]="contextMenuItems"
+    [frozenRows]='frozenRow' [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)'
+    [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'>
     <e-columns>
       <e-column field='taskID' headerText='Task ID' [validationRules]='taskidRule' width='100' minWidth='70'
         textAlign='Right' isPrimaryKey='true'></e-column>

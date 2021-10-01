@@ -63,11 +63,14 @@ export class AppComponent implements OnInit {
   public copiedData: any;
   public operation: string;
   public editTypeColumns: object = { 'boolean': 'booleanedit', 'dropDownList': 'dropdownedit', 'number': 'numericedit', 'string': 'defaultedit', 'date': 'datepickeredit' };
-
+  public flag: boolean;
+  public addItemIndex: number;
   // public ddParams: object;
 
   ngOnInit(): void {
     this.data = sampleData;
+    this.flag = false;
+    this.addItemIndex = 0;
     //   this.ddParams = { params: { value: 'Germany' } };
     //this.selectedDatatype = '';
     this.index = (this.data.length * 4) + 1;
@@ -78,7 +81,8 @@ export class AppComponent implements OnInit {
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
-    this.contextMenuItems = ['Edit', 'Delete', 'Save', 'Cancel',
+    this.contextMenuItems = ['Edit', 'Save', 'Cancel',
+      { text: 'Delete Record', target: '.e-content', id: 'delete', iconCss: 'e-icons e-delete' },
       { text: 'Add Record', target: '.e-content', id: 'add', iconCss: 'e-icons e-add' },
       { text: 'Copy', target: '.e-content', id: 'copy', iconCss: 'e-icons e-copy' },
       { text: 'Cut', target: '.e-content', id: 'cut', iconCss: 'e-icons e-cut' },
@@ -116,13 +120,21 @@ export class AppComponent implements OnInit {
       column.visible = false;
       this.grid.refreshColumns();
     }
-
+    if (args.item.id === 'delete') {
+      console.log(args);
+      this.grid.deleteRecord(null, args['rowInfo']['rowData']);
+      this.refresh();
+    }
     if (args.item.id === 'freezecolumn') {
       let column = this.grid.getColumnByField(args['column'].field);
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
 
     }
     if (args.item.id === 'add') {
+      if (args['rowInfo'].hasOwnProperty('rowIndex')) {
+        this.addItemIndex = args['rowInfo']['rowIndex'];
+
+      }
       this.grid.addRecord();
     }
     if (args.item.id === 'multiselect') {
@@ -150,12 +162,13 @@ export class AppComponent implements OnInit {
       }
 
       this.copiedData = args['rowInfo']['rowData'];
-
+      this.selectedIndex = this.grid.getSelectedRecords();
       this.grid.copy();
     }
     if (args.item.id === 'cut') {
       this.operation = 'cut';
-      this.selectedIndex = this.grid.getSelectedRowIndexes();
+      this.selectedIndex = this.grid.getSelectedRecords();
+      // console.log(this.selectedIndex);
       //var copiedrows = this.grid.filter(it => it['taskID'] == 5 || it['taskID'] == 2);
       //console.log(copiedrows);
       this.copiedData = args['rowInfo']['rowData'];
@@ -207,33 +220,34 @@ export class AppComponent implements OnInit {
     }
   }
   public pasteContent(index: number) {
-    // let newData = this.getDataFromClipBoard();
-    // setTimeout(() => {
-    //   let newObj = this.convertIntObj(newData);
-    //   newObj.forEach((x, num) => {
-    //     x['taskID'] = this.index++;
-    //     this.grid.addRecord({ ...x }, index);
-    //   });
-    //   this.refresh();
-    // }
-    //   , 200);
-
+    this.flag = true;
     let newData = this.copiedData;
-    // newData.forEach(element => {
+    if (this.operation == 'cut') {
+      this.selectedIndex.forEach(element => {
+        this.grid.deleteRecord(null, element);
+      });
+      //  this.refresh();
+    }
 
-    //   //;
-    // });
-    this.grid.addRecord({ ...newData }, index)
+    this.selectedIndex.forEach((element) => {
+      let newData = {
+        ...element
+      };
+      //delete newData.taskData;
+      let obj = { ...newData['taskData'] };
+      if (this.operation == 'copy') {
+        this.index++;
+        obj.taskID = this.index;
+      }
+      console.log(obj);
+      console.log(index);
+
+      this.grid.addRecord(obj, index)
+    });
+
+    this.refresh();
     //this.refresh();
-    // if (this.operation == 'cut') {
-    //   this.selectedIndex.forEach(element => {
-    //     this.grid.selectRow(element);
-    //     this.grid.deleteRecord();
-
-    //   });
-    //   this.refresh();
-
-    // }
+    this.flag = false;
   }
   public changeType = (): any => {
     // if (this.dataType.nativeElement.value == 'boolean') {
@@ -278,9 +292,11 @@ export class AppComponent implements OnInit {
       this.grid.refreshColumns();
       this.data.forEach((a) => {
         a[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
-        a['subtasks'].forEach((b) => {
-          b[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
-        });
+        if (a.hasOwnProperty('subtasks')) {
+          a['subtasks'].forEach((b) => {
+            b[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
+          });
+        }
       });
       this.grid.dataSource = this.data;
       this.grid.refresh();
@@ -417,21 +433,36 @@ export class AppComponent implements OnInit {
 
 
   public refresh() {
+    this.grid.showSpinner();
+    setTimeout(() => {
+      this.grid.refresh();
+      this.grid.hideSpinner();
 
-    setTimeout(() => this.grid.refresh(), 1000);
+    }, 200);
   }
-  // actionBegin(args) {
-  //   if (args.requestType == 'save' && args.action == 'add') {
-  //     args['cancel'] = true;
-  //     console.log(args['data']);
+  actionBegin(args) {
 
-  //     this.grid.addRecord({ ...args['data'] }, 0);
-  //     //this.data.push(args['data']);
-  //     this.grid.closeEdit();
-  //     //this.grid.getCurrentViewRecords().unshift(args.data);
-  //   }
-  // }
-  actionComplete($event) {
+    if (args.requestType == 'save' && args.action == 'add' && this.flag == false) {
+      this.flag = true;
+      args['cancel'] = true;
+      let data = args['data'];
+      this.grid.addRecord({ ...data }, this.addItemIndex);
+      this.grid.closeEdit();
+      //this.grid.refresh();
+      this.refresh();
+      this.flag = false;
+
+    }
+  }
+  actionComplete(args) {
+    // console.log(args);
+    // if (args.requestType == 'save' && args.action == 'add') {
+    //   this.refresh;
+    // }
+    //  this.refresh();
+
+    //this.refresh();
+    //console.log($event);
     //alert("ok");    //if ($event['action'] == 'Add') {
 
     //  this.refresh();
