@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
-import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService, BooleanEditCell } from '@syncfusion/ej2-angular-grids';
+import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService, BooleanEditCell, extendObjWithFn } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
@@ -155,11 +155,12 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'copy') {
       this.operation = 'copy';
       let selectedItems = this.grid.getSelectedRowIndexes();
-      for (let i in selectedItems) {
-        this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
-          a.style.background = 'lightpink';
-        });
-      }
+      this.highlightColor(selectedItems, 'copy');
+      // for (let i in selectedItems) {
+      //   this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
+      //     a.style.background = 'lightpink';
+      //   });
+      //}
 
       this.copiedData = args['rowInfo']['rowData'];
       this.selectedIndex = this.grid.getSelectedRecords();
@@ -168,12 +169,10 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'cut') {
       this.operation = 'cut';
       this.selectedIndex = this.grid.getSelectedRecords();
-      // console.log(this.selectedIndex);
-      //var copiedrows = this.grid.filter(it => it['taskID'] == 5 || it['taskID'] == 2);
-      //console.log(copiedrows);
+      let selectedItems = this.grid.getSelectedRowIndexes();
+      this.highlightColor(selectedItems, 'cut');
       this.copiedData = args['rowInfo']['rowData'];
       this.grid.copy();
-      //this.grid.deleteRecord();
 
     }
     if (args.item.id === 'collapse') {
@@ -194,6 +193,8 @@ export class AppComponent implements OnInit {
       this.headerText.nativeElement.value = '';
       this.dataType.nativeElement.value = '';
       this.minWidth.nativeElement.value = '';
+      this.dropDownValues.nativeElement.value = '';
+      this.selectedDatatype = "";
       this.isEditOperation = false;
       this.Dialog.show();
     }
@@ -207,6 +208,7 @@ export class AppComponent implements OnInit {
       let obj = args['column'];
       let elem = obj['format'] ? obj['type'].concat('-', obj['format']) : obj['type'];
       this.dataType.nativeElement.value = elem;
+      this.selectedDatatype = elem;
       this.Dialog.show();
     }
     if (args.item.id === 'pastechild') {
@@ -219,15 +221,18 @@ export class AppComponent implements OnInit {
       this.pasteContent(args['rowInfo'].rowIndex);
     }
   }
+  public highlightColor = (selectedItems: any, operation: string) => {
+    for (let i in selectedItems) {
+      this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
+        a.style.background = 'lightpink';
+      });
+    }
+  }
   public pasteContent(index: number) {
     this.flag = true;
     let newData = this.copiedData;
-    if (this.operation == 'cut') {
-      this.selectedIndex.forEach(element => {
-        this.grid.deleteRecord(null, element);
-      });
-      //  this.refresh();
-    }
+    let numberOfDeletedRows = 0;
+
 
     this.selectedIndex.forEach((element) => {
       let newData = {
@@ -235,12 +240,20 @@ export class AppComponent implements OnInit {
       };
       //delete newData.taskData;
       let obj = { ...newData['taskData'] };
-      if (this.operation == 'copy') {
-        this.index++;
-        obj.taskID = this.index;
+      if (this.operation == 'cut') {
+        if (element['index'] < index) {
+          index--;
+        }
+        this.grid.deleteRecord(null, element);
+
       }
-      console.log(obj);
-      console.log(index);
+      if (this.operation == 'copy') {
+
+        obj.taskID = this.index++;
+
+        this.changeSubTaskId(obj);
+      }
+
 
       this.grid.addRecord(obj, index)
     });
@@ -248,6 +261,23 @@ export class AppComponent implements OnInit {
     this.refresh();
     //this.refresh();
     this.flag = false;
+  }
+  public changeSubTaskId(obj: object): void {
+    console.log(obj);
+    if (obj.hasOwnProperty('subtasks')) {
+      // obj['subtasks'] = [...obj['subtasks']];
+      let arr = [];
+      obj['subtasks'].forEach((element) => {
+        if (element.hasOwnProperty('subtasks')) {
+          this.changeSubTaskId(element);
+        }
+        let newElem = { ...element }
+
+        newElem['taskID'] = this.index++;
+        arr.push(newElem);
+      });
+      obj['subtasks'] = arr;
+    }
   }
   public changeType = (): any => {
     // if (this.dataType.nativeElement.value == 'boolean') {
@@ -265,6 +295,7 @@ export class AppComponent implements OnInit {
     let dataType = this.dataType.nativeElement.value;
     let minWidth = this.minWidth.nativeElement.value;
     let editType = this.editTypeColumns[dataType];
+
     let newData = dataType.split('-');
     let rowDetails: any = { width: 100, minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign, editType: editType };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
@@ -320,6 +351,7 @@ export class AppComponent implements OnInit {
       let format = this.dataType.nativeElement.value;
       let newData = format.split('-');
       this.grid.getColumnByField(field).type = newData[0];
+
 
       this.grid.getColumnByField(field).editType = this.editTypeColumns[newData[0]];
       // if (newData[0] == 'boolean' || newData[0] == 'numeric') {
@@ -446,13 +478,33 @@ export class AppComponent implements OnInit {
       this.flag = true;
       args['cancel'] = true;
       let data = args['data'];
-      this.grid.addRecord({ ...data }, this.addItemIndex);
-      this.grid.closeEdit();
-      //this.grid.refresh();
-      this.refresh();
-      this.flag = false;
+      if (this.validatePk(data['taskID'])) {
+        this.grid.addRecord({ ...data }, this.addItemIndex);
+        this.grid.closeEdit();
+        //this.grid.refresh();
+        this.refresh();
+        this.flag = false;
+      } else {
+        alert("Task ID should be unique id");
+      }
 
     }
+  }
+  validatePk(taskID: number) {
+    let valid = true;
+    this.data.forEach((element) => {
+      if (element['taskID'] == taskID) {
+        valid = false;
+      }
+      if (element.hasOwnProperty('subtasks')) {
+        element['subtasks'].forEach(val => {
+          if (val['taskID'] == taskID) {
+            valid = false;
+          }
+        });
+      }
+    });
+    return valid;
   }
   actionComplete(args) {
     // console.log(args);
