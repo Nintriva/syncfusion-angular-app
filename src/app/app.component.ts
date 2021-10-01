@@ -5,7 +5,8 @@ import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegri
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
-import { exit } from 'process';
+import { Query } from '@syncfusion/ej2-data';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -26,6 +27,8 @@ export class AppComponent implements OnInit {
   @ViewChild('fontFamily') public fontFamily: ElementRef;
   @ViewChild('dataType') public dataType: ElementRef;
   @ViewChild('minWidth') public minWidth: ElementRef;
+  @ViewChild('dropDownValues') public dropDownValues: ElementRef;
+
   public showCloseIcon: Boolean = true;
   public height = '60vh';
   public target = '.control-section';
@@ -35,7 +38,7 @@ export class AppComponent implements OnInit {
 
   public data: Object[];
   public index: number;
-  public showBoolean: boolean;
+  public selectedDatatype: string;
   public selectedIndex: any;
   public contextMenuItems: any;
   public editing: EditSettingsModel;
@@ -66,7 +69,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.data = sampleData;
     //   this.ddParams = { params: { value: 'Germany' } };
-    this.showBoolean = false;
+    //this.selectedDatatype = '';
     this.index = (this.data.length * 4) + 1;
     this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
@@ -89,7 +92,7 @@ export class AppComponent implements OnInit {
       { text: 'Multi-Select On/Off', target: '.e-content', id: 'multiselect', iconCss: 'e-icons e-sort' },
       { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
       { text: 'Paste as sibling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
-      { text: 'Paste as Child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
+      { text: 'Paste as child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
       { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
 
     ];
@@ -153,9 +156,11 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'cut') {
       this.operation = 'cut';
       this.selectedIndex = this.grid.getSelectedRowIndexes();
+      //var copiedrows = this.grid.filter(it => it['taskID'] == 5 || it['taskID'] == 2);
+      //console.log(copiedrows);
       this.copiedData = args['rowInfo']['rowData'];
       this.grid.copy();
-      this.grid.deleteRecord();
+      //this.grid.deleteRecord();
 
     }
     if (args.item.id === 'collapse') {
@@ -231,11 +236,12 @@ export class AppComponent implements OnInit {
     // }
   }
   public changeType = (): any => {
-    if (this.dataType.nativeElement.value == 'boolean') {
-      this.showBoolean = true;
-    } else {
-      this.showBoolean = false;
-    }
+    // if (this.dataType.nativeElement.value == 'boolean') {
+    //   this.showBoolean = true;
+    // } else {
+    //   this.showBoolean = false;
+    // }
+    this.selectedDatatype = this.dataType.nativeElement.value;
   }
   public addColumn = (): void => {
     let field = this.field.nativeElement.value;
@@ -248,7 +254,26 @@ export class AppComponent implements OnInit {
     let newData = dataType.split('-');
     let rowDetails: any = { width: 100, minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign, editType: editType };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';
-    rowDetails['format'] = newData[1] ? newData[1] : '';
+    if (rowDetails['type'] == 'dropDownList') {
+      let ds = [];
+      let dropValues = this.dropDownValues.nativeElement.value;
+      let elems = dropValues.split(',');
+      elems.forEach(element => {
+        ds.push({ type: element });
+      });
+      let editParams = {
+        params: {
+          query: new Query(),
+          dataSource: ds,
+          fields: { value: 'type', text: 'type' }
+        }
+      }
+      rowDetails['edit'] = editParams;
+    }
+    if (rowDetails['type'] == 'date') {
+      rowDetails['format'] = 'yyyy/MM/dd';
+    }
+    console.log(rowDetails);
     if (this.grid.columns.push(rowDetails)) {
       this.grid.refreshColumns();
       this.data.forEach((a) => {
@@ -389,14 +414,25 @@ export class AppComponent implements OnInit {
 
     return is_valid;
   }
-  public beginEdit(l) {
-  }
+
+
   public refresh() {
 
     setTimeout(() => this.grid.refresh(), 1000);
   }
+  // actionBegin(args) {
+  //   if (args.requestType == 'save' && args.action == 'add') {
+  //     args['cancel'] = true;
+  //     console.log(args['data']);
+
+  //     this.grid.addRecord({ ...args['data'] }, 0);
+  //     //this.data.push(args['data']);
+  //     this.grid.closeEdit();
+  //     //this.grid.getCurrentViewRecords().unshift(args.data);
+  //   }
+  // }
   actionComplete($event) {
-    //if ($event['action'] == 'Add') {
+    //alert("ok");    //if ($event['action'] == 'Add') {
 
     //  this.refresh();
     //  }

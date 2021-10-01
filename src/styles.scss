@@ -92,6 +92,13 @@ td.e-rowcell {
   content: '\e501';
 }
 
+.e-grid .e-ccdlg .e-cc-contentdiv {
+  min-height: 290px !important;
+}
+
+.e-grid .e-ccdlg .e-dlg-content {
+  margin-top: 60px !important
+}
 
 .e-sort:before {
   content: '\e890';
