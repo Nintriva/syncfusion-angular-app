@@ -6,6 +6,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
 import { Query } from '@syncfusion/ej2-data';
+import { from, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -65,6 +66,7 @@ export class AppComponent implements OnInit {
   public editTypeColumns: object = { 'boolean': 'booleanedit', 'dropDownList': 'dropdownedit', 'number': 'numericedit', 'string': 'defaultedit', 'date': 'datepickeredit' };
   public flag: boolean;
   public addItemIndex: number;
+  public deletedIndex: number;
   // public ddParams: object;
 
   ngOnInit(): void {
@@ -229,33 +231,33 @@ export class AppComponent implements OnInit {
     }
   }
   public pasteContent(index: number) {
+    this.grid.showSpinner();
     this.flag = true;
     let newData = this.copiedData;
     let numberOfDeletedRows = 0;
 
 
-    this.selectedIndex.forEach(async (element) => {
+    this.selectedIndex.forEach(async (element: object) => {
       // let newData = element;
       let newData = this.copyObject(element);
       // let newData = { ...element };
       //delete newData.taskData;
       let obj = { ...newData['taskData'] };
       if (this.operation == 'cut') {
-        await this.deleteObjectRecord(element, index);
-
+        this.deletedIndex = index;
+        this.deleteObjectRecord(element);
+        await this.wait(1);
+        console.log({ 'index': this.deletedIndex, 'obj': obj });
+        this.grid.addRecord(obj, this.deletedIndex);
       }
       if (this.operation == 'copy') {
 
         obj.taskID = this.index++;
 
         this.changeSubTaskId(obj);
-      }
-      setTimeout(() => {
-        console.log({ 'index': index, 'element': element });
-        console.log({ 'index': index, 'newData': newData });
-
         this.grid.addRecord(obj, index)
-      }, 200);
+      }
+
     });
 
     this.refresh();
@@ -263,20 +265,31 @@ export class AppComponent implements OnInit {
     this.flag = false;
   }
 
-  public deleteObjectRecord(element: object, index: number) {
+  public deleteObjectRecord(element: object) {
+    return new Promise<void>((resolve, reject) => {
+      if (element.hasOwnProperty('subtasks')) {
+        element['subtasks'].forEach(async (element1) => {
+          if (element1.hasOwnProperty('subtasks')) {
+            await this.deleteObjectRecord(element1);
+          }
+          console.log(this.deletedIndex);
+          console.log(element['index']);
+          if (element['index'] < this.deletedIndex) {
+            this.deletedIndex--;
+          }
+          // this.grid.deleteRecord('taskId', element);
+          resolve();
+          return;
+        })
+      }
 
-    if (element.hasOwnProperty('subtasks')) {
-      element['subtasks'].forEach((element1) => {
-        this.deleteObjectRecord(element1, index)
-      });
-    }
-    if (element['index'] < index) {
-      index--;
-    }
-    setTimeout(() => {
+      if (element['index'] < this.deletedIndex) {
+        console.log("main");
+        this.deletedIndex--;
+      }
       this.grid.deleteRecord('taskId', element);
-    }, 200);
-
+      resolve();
+    });
   }
 
   public copyObject(element: object) {
@@ -493,6 +506,13 @@ export class AppComponent implements OnInit {
     }, 200);
   }
 
+  public wait(num: number) {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, num);
+    });
+  }
 
   actionBegin(args) {
 
