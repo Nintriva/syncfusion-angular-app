@@ -234,17 +234,14 @@ export class AppComponent implements OnInit {
     let numberOfDeletedRows = 0;
 
 
-    this.selectedIndex.forEach((element) => {
-      let newData = {
-        ...element
-      };
+    this.selectedIndex.forEach(async (element) => {
+      // let newData = element;
+      let newData = this.copyObject(element);
+      // let newData = { ...element };
       //delete newData.taskData;
       let obj = { ...newData['taskData'] };
       if (this.operation == 'cut') {
-        if (element['index'] < index) {
-          index--;
-        }
-        this.grid.deleteRecord(null, element);
+        await this.deleteObjectRecord(element, index);
 
       }
       if (this.operation == 'copy') {
@@ -253,14 +250,37 @@ export class AppComponent implements OnInit {
 
         this.changeSubTaskId(obj);
       }
+      setTimeout(() => {
+        console.log({ 'index': index, 'element': element });
+        console.log({ 'index': index, 'newData': newData });
 
-
-      this.grid.addRecord(obj, index)
+        this.grid.addRecord(obj, index)
+      }, 200);
     });
 
     this.refresh();
     //this.refresh();
     this.flag = false;
+  }
+
+  public deleteObjectRecord(element: object, index: number): number {
+
+    if (element.hasOwnProperty('subtasks')) {
+      element['subtasks'].forEach((element1) => {
+        index = this.deleteObjectRecord(element1, index)
+      });
+    }
+    if (element['index'] < index) {
+      index--;
+    }
+    setTimeout(() => {
+      this.grid.deleteRecord('taskId', element);
+    }, 200);
+    return index;
+  }
+
+  public copyObject(element: object) {
+    return JSON.parse(JSON.stringify(element))
   }
   public changeSubTaskId(obj: object): void {
     console.log(obj);
@@ -472,6 +492,8 @@ export class AppComponent implements OnInit {
 
     }, 200);
   }
+
+
   actionBegin(args) {
 
     if (args.requestType == 'save' && args.action == 'add' && this.flag == false) {
