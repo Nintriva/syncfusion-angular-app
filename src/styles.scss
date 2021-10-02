@@ -56,9 +56,16 @@ td.e-rowcell {
   cursor: pointer;
 }
 
+form td.e-rowcell {
+  border: 0px !important;
+}
+
 // tr.e-row {
 //   width: 100%;
 // }
+.gridcomp_gridcontrol_dialogEdit_wrapper {
+  height: 600px !important;
+}
 
 .e-input {
   width: 100%;

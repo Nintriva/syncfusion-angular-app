@@ -7,6 +7,7 @@ import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
 import { Query } from '@syncfusion/ej2-data';
 import { from, Observable } from 'rxjs';
+import { ObjectType } from '@syncfusion/ej2-pdf-export';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,7 @@ export class AppComponent implements OnInit {
   public wrapSettings: TextWrapSettingsModel;
   public allowMultiSorting: boolean = false;
   public enableCollapseAll: boolean = false;
-  public allowFiltering: boolean = false;
+  public allowFiltering: boolean = true;
   public allowResizing: boolean = true;
   public allowTextWrap: boolean;
   public allowReordering: boolean = true;
@@ -59,7 +60,7 @@ export class AppComponent implements OnInit {
   public toolbarOptions: ToolbarItems[];
   public availableDataTypes: string[] = ['string', 'boolean', 'dropDownList', 'number', 'date'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
-  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Row", newRowPosition: "Below" };
+  public editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: "Dialog", newRowPosition: "Below" };
   public selectionSettings: Object;
   public copiedData: any;
   public operation: string;
@@ -67,12 +68,14 @@ export class AppComponent implements OnInit {
   public flag: boolean;
   public addItemIndex: number;
   public deletedIndex: number;
+  public filteringOptions: Object;
   // public ddParams: object;
 
   ngOnInit(): void {
     this.data = sampleData;
     this.flag = false;
     this.addItemIndex = 0;
+    this.filteringOptions = { type: "Excel" };
     //   this.ddParams = { params: { value: 'Germany' } };
     //this.selectedDatatype = '';
     this.index = (this.data.length * 4) + 1;
@@ -92,11 +95,11 @@ export class AppComponent implements OnInit {
       { text: 'Collapse On/Off', target: '.e-headercontent', id: 'collapse', iconCss: 'e-icons e-freeze' },
       { text: 'Add Column', target: '.e-headercontent', id: 'addcolumn', iconCss: 'e-icons e-add-col' },
       { text: 'Edit Column', target: '.e-headercontent', id: 'editcolumn', iconCss: 'e-icons e-edit-col' },
-      { text: 'Del Column', target: '.e-headercontent', id: 'delcolumn', iconCss: 'e-icons e-del-col' },
+      { text: 'Delele Column', target: '.e-headercontent', id: 'delcolumn', iconCss: 'e-icons e-del-col' },
       { text: 'Filter On/Off', target: '.e-headercontent', id: 'filter', iconCss: 'e-icons e-filter' },
       { text: 'Multi-Sort On/Off', target: '.e-headercontent', id: 'sort', iconCss: 'e-icons e-sort' },
       { text: 'Multi-Select On/Off', target: '.e-content', id: 'multiselect', iconCss: 'e-icons e-sort' },
-      { text: 'style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
+      { text: 'Style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
       { text: 'Paste as sibling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
       { text: 'Paste as child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
       { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
@@ -195,7 +198,7 @@ export class AppComponent implements OnInit {
       this.headerText.nativeElement.value = '';
       this.dataType.nativeElement.value = '';
       this.minWidth.nativeElement.value = '';
-      this.dropDownValues.nativeElement.value = '';
+      //this.dropDownValues.nativeElement.value = '';
       this.selectedDatatype = "";
       this.isEditOperation = false;
       this.Dialog.show();
@@ -323,6 +326,7 @@ export class AppComponent implements OnInit {
     this.selectedDatatype = this.dataType.nativeElement.value;
   }
   public addColumn = (): void => {
+
     let field = this.field.nativeElement.value;
     let headerText = this.headerText.nativeElement.value;
     let defaultValue = this.defaultValue.nativeElement.value;
@@ -330,7 +334,10 @@ export class AppComponent implements OnInit {
     let dataType = this.dataType.nativeElement.value;
     let minWidth = this.minWidth.nativeElement.value;
     let editType = this.editTypeColumns[dataType];
-
+    if (field == '' || headerText == '') {
+      alert('please fill field name and header text');
+      return;
+    }
     let newData = dataType.split('-');
     let rowDetails: any = { width: 100, minWidth: minWidth, field: field, headerText: headerText, defaultValue: defaultValue, textAlign: textAlign, editType: editType };
     rowDetails['type'] = newData[0] ? newData[0] : 'string';

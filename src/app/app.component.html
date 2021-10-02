@@ -6,11 +6,11 @@
     [allowRowDragAndDrop]='true' [allowResizing]='allowResizing' [editSettings]='editSettings'
     [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true' [contextMenuItems]="contextMenuItems"
     [frozenRows]='frozenRow' [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)'
-    [allowFiltering]='allowFiltering' [allowReordering]='allowReordering'>
+    [allowFiltering]='allowFiltering' [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
     <e-columns>
-      <e-column field='taskID' headerText='Task ID' [validationRules]='taskidRule' width='100' minWidth='70'
+      <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
         textAlign='Right' isPrimaryKey='true'></e-column>
-      <e-column field='assignee' headerText='Asignee' width='400' minWidth='200' [validationRules]='assigneeRule'>
+      <e-column field='assignee' headerText='Asignee' width='400' minWidth='400' [validationRules]='assigneeRule'>
       </e-column>
       <e-column field='email' headerText='Email' width='200' minWidth='200' textAlign='Right'></e-column>
 
@@ -125,7 +125,7 @@
         </div>
       </div>
       <div class="col-md-12 new-row">
-        <div class="col-md-6"> <label for="fontFamily">Select font Family:</label></div>
+        <div class="col-md-6"> <label for="fontFamily">Select font family:</label></div>
         <div class="col-md-6">
           <select id="fontFamily" #fontFamily name="fontFamily" value="" placeholder="eg. Times New Roman"
             class="fl form-control">
