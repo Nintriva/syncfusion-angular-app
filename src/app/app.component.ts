@@ -263,11 +263,11 @@ export class AppComponent implements OnInit {
     this.flag = false;
   }
 
-  public deleteObjectRecord(element: object, index: number): number {
+  public deleteObjectRecord(element: object, index: number) {
 
     if (element.hasOwnProperty('subtasks')) {
       element['subtasks'].forEach((element1) => {
-        index = this.deleteObjectRecord(element1, index)
+        this.deleteObjectRecord(element1, index)
       });
     }
     if (element['index'] < index) {
@@ -276,7 +276,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       this.grid.deleteRecord('taskId', element);
     }, 200);
-    return index;
+
   }
 
   public copyObject(element: object) {
