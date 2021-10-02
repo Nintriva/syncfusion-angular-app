@@ -236,7 +236,7 @@ export class AppComponent implements OnInit {
     let newData = this.copiedData;
     let numberOfDeletedRows = 0;
 
-
+    this.deletedIndex = index;
     this.selectedIndex.forEach(async (element: object) => {
       // let newData = element;
       let newData = this.copyObject(element);
@@ -244,7 +244,7 @@ export class AppComponent implements OnInit {
       //delete newData.taskData;
       let obj = { ...newData['taskData'] };
       if (this.operation == 'cut') {
-        this.deletedIndex = index;
+
         this.deleteObjectRecord(element);
         await this.wait(1);
         console.log({ 'index': this.deletedIndex, 'obj': obj });
@@ -260,8 +260,10 @@ export class AppComponent implements OnInit {
 
     });
 
-    this.refresh();
     //this.refresh();
+    //this.refresh();
+
+    this.grid.hideSpinner();
     this.flag = false;
   }
 
