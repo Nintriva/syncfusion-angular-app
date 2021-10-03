@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
   public contextMenuItems: any;
   public editing: EditSettingsModel;
   public wrapSettings: TextWrapSettingsModel;
-  public allowMultiSorting: boolean = false;
+  public allowMultiSorting: boolean;
   public enableCollapseAll: boolean = false;
   public allowFiltering: boolean = true;
   public allowResizing: boolean = true;
@@ -73,6 +73,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = sampleData;
+    this.allowMultiSorting = true;
     this.flag = false;
     this.addItemIndex = 0;
     this.filteringOptions = { type: "Excel" };
