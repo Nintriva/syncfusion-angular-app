@@ -131,3 +131,17 @@ form td.e-rowcell {
   display: inline-block;
   padding-right: 10px;
 }
+
+.a-erow {
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow-wrap: initial !important;
+  word-wrap: initial !important;
+}
+
+.b-erow {
+  white-space: normal !important;
+  text-overflow: auto !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important  ;
+}

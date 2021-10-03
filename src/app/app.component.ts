@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   @ViewChild('dataType') public dataType: ElementRef;
   @ViewChild('minWidth') public minWidth: ElementRef;
   @ViewChild('dropDownValues') public dropDownValues: ElementRef;
-
+  @ViewChild('wrapSelect') public wrapSelect: ElementRef;
   public showCloseIcon: Boolean = true;
   public height = '60vh';
   public target = '.control-section';
@@ -102,7 +102,7 @@ export class AppComponent implements OnInit {
       { text: 'Style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
       { text: 'Paste as sibling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
       { text: 'Paste as child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
-      { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
+      // { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
 
     ];
 
@@ -424,15 +424,17 @@ export class AppComponent implements OnInit {
 
   public updateStyle = (): void => {
     let field = this.colField.nativeElement.value;
+
     let style = {
       'background-color': this.bgColor.nativeElement.value,
       'color': this.color.nativeElement.value,
       'font-size': this.fontSize.nativeElement.value,
       'font-family': this.fontFamily.nativeElement.value,
     }
-
+    let c = this.wrapSelect.nativeElement.value == 'Disable' ? 'a-erow' : 'b-erow';
     this.grid.getColumnByField(field).customAttributes = {
-      style: style,
+      'style': style,
+      'class': c,
     };
     this.grid.refreshColumns();
     this.styleDialog.hide();
