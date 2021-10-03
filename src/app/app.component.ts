@@ -147,8 +147,7 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'multiselect') {
       let settings = this.grid.selectionSettings;
       settings.type === 'Single' ? settings.type = 'Multiple' : settings.type = 'Single';
-      alert(settings.type);
-      //this.grid.refresh();
+      this.grid.refresh();
     }
     if (args.item.id === 'wrap') {
       let settings = this.grid.textWrapSettings;
