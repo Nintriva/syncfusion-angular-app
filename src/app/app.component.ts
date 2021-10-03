@@ -69,10 +69,12 @@ export class AppComponent implements OnInit {
   public addItemIndex: number;
   public deletedIndex: number;
   public filteringOptions: Object;
+  public customStyle: any;
   // public ddParams: object;
 
   ngOnInit(): void {
     this.data = sampleData;
+    this.customStyle = [];
     this.allowMultiSorting = true;
     this.flag = false;
     this.addItemIndex = 0;
@@ -103,7 +105,6 @@ export class AppComponent implements OnInit {
       { text: 'Style', target: '.e-headercontent', id: 'style', iconCss: 'e-icons e-style' },
       { text: 'Paste as sibling', target: '.e-content', id: 'paste', iconCss: 'e-icons e-paste' },
       { text: 'Paste as child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
-      // { text: 'Column TextWrap On/off', target: '.e-headercontent', id: 'wrap', iconCss: 'e-icons e-del-col' },
 
     ];
 
@@ -146,7 +147,8 @@ export class AppComponent implements OnInit {
     if (args.item.id === 'multiselect') {
       let settings = this.grid.selectionSettings;
       settings.type === 'Single' ? settings.type = 'Multiple' : settings.type = 'Single';
-      this.grid.refresh();
+      alert(settings.type);
+      //this.grid.refresh();
     }
     if (args.item.id === 'wrap') {
       let settings = this.grid.textWrapSettings;
@@ -186,6 +188,23 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
+      console.log(this.customStyle[args['column']['field']]);
+      if (this.customStyle.hasOwnProperty(args['column']['field'])) {
+
+        let elem = this.customStyle[args['column']['field']];
+        this.color.nativeElement.value = elem['color'];
+        this.bgColor.nativeElement.value = elem['background-color'];
+        this.fontFamily.nativeElement.value = elem['font-family'];
+        this.fontSize.nativeElement.value = elem['font-size'];
+        this.wrapSelect.nativeElement.value = elem['wrap'];
+
+      } else {
+        this.color.nativeElement.value = '#000000';
+        this.bgColor.nativeElement.value = '#ffffff';
+        this.fontFamily.nativeElement.value = 'sans-serif';
+        this.fontSize.nativeElement.value = '13px';
+        this.wrapSelect.nativeElement.value = "Disable";
+      }
       this.styleDialog.show();
     }
 
@@ -437,6 +456,8 @@ export class AppComponent implements OnInit {
       'style': style,
       'class': c,
     };
+    this.customStyle[field] = { ...style, wrap: this.wrapSelect.nativeElement.value };
+    console.log(this.customStyle);
     this.grid.refreshColumns();
     this.styleDialog.hide();
   }
