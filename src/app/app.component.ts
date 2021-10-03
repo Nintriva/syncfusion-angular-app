@@ -188,7 +188,6 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
-      console.log(this.customStyle[args['column']['field']]);
       if (this.customStyle.hasOwnProperty(args['column']['field'])) {
 
         let elem = this.customStyle[args['column']['field']];
