@@ -218,6 +218,7 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'pastechild') {
       this.grid.editSettings.newRowPosition = "Child";
+      console.log(args);
       this.pasteContent(args['rowInfo'].rowIndex);
 
     }
@@ -236,63 +237,77 @@ export class AppComponent implements OnInit {
   public pasteContent(index: number) {
     this.grid.showSpinner();
     this.flag = true;
-    let newData = this.copiedData;
-    let numberOfDeletedRows = 0;
+    // let newData = this.copiedData;
+    // let numberOfDeletedRows = 0;
 
     this.deletedIndex = index;
-    this.selectedIndex.forEach(async (element: object) => {
-      // let newData = element;
-      let newData = this.copyObject(element);
-      // let newData = { ...element };
-      //delete newData.taskData;
-      let obj = { ...newData['taskData'] };
-      if (this.operation == 'cut') {
 
-        this.deleteObjectRecord(element);
-        await this.wait(1);
-        console.log({ 'index': this.deletedIndex, 'obj': obj });
-        this.grid.addRecord(obj, this.deletedIndex);
-      }
-      if (this.operation == 'copy') {
-
+    if (this.operation == 'cut') {
+      let objArray = [];
+      Promise.all(this.selectedIndex.map(async (element: object): Promise<void> => {
+        let newData = this.copyObject(element);
+        objArray.push(newData['taskData']);
+        await this.deleteObjectRecord(element);
+        console.log('deleting', element);
+      })).then(async () => {
+        console.log('objArray', objArray);
+        await this.wait(100);
+        objArray.forEach(async (obj1: object) => {
+          let data = this.copyObject(obj1);
+          console.log({ 'index': this.deletedIndex, 'data': data });
+          await this.wait(1);
+          this.addItemIndex = this.deletedIndex;
+          await this.wait(1);
+          this.grid.addRecord(data, this.deletedIndex);
+        });
+      });
+    }
+    if (this.operation == 'copy') {
+      this.selectedIndex.forEach(async (element: object) => {
+        let newData = this.copyObject(element);
+        let obj = { ...newData['taskData'] };
         obj.taskID = this.index++;
-
         this.changeSubTaskId(obj);
+        await this.wait(1);
+        this.addItemIndex = index;
+        await this.wait(1);
         this.grid.addRecord(obj, index)
-      }
 
-    });
 
-    //this.refresh();
-    //this.refresh();
+      });
+    }
+    this.refresh();
 
-    this.grid.hideSpinner();
+
+    // this.grid.hideSpinner();
     this.flag = false;
+
   }
 
-  public deleteObjectRecord(element: object) {
-    return new Promise<void>((resolve, reject) => {
+  public deleteObjectRecord(element: object, deleteRow: boolean = true) {
+    return new Promise<void>(async (resolve, reject) => {
       if (element.hasOwnProperty('subtasks')) {
-        element['subtasks'].forEach(async (element1) => {
+        element['subtasks'].forEach(async (element1: any) => {
           if (element1.hasOwnProperty('subtasks')) {
-            await this.deleteObjectRecord(element1);
+            await this.deleteObjectRecord(element1, false);
           }
-          console.log(this.deletedIndex);
-          console.log(element['index']);
           if (element['index'] < this.deletedIndex) {
             this.deletedIndex--;
+            console.log(this.deletedIndex);
           }
-          // this.grid.deleteRecord('taskId', element);
-          resolve();
-          return;
-        })
+        });
       }
 
-      if (element['index'] < this.deletedIndex) {
-        console.log("main");
-        this.deletedIndex--;
+      if (deleteRow == true) {
+        if (element['index'] < this.deletedIndex) {
+          console.log("main");
+          this.deletedIndex--;
+          console.log(this.deletedIndex);
+        }
+        await this.wait(1);
+
+        this.grid.deleteRecord('taskId', element);
       }
-      this.grid.deleteRecord('taskId', element);
       resolve();
     });
   }
@@ -526,9 +541,11 @@ export class AppComponent implements OnInit {
   actionBegin(args) {
 
     if (args.requestType == 'save' && args.action == 'add' && this.flag == false) {
+      console.log('beg', args);
+      console.log('this.addItemIndex', this.addItemIndex);
       this.flag = true;
       args['cancel'] = true;
-      let data = args['data'];
+      let data = this.copyObject(args['data']);
       if (this.validatePk(data['taskID'])) {
         this.grid.addRecord({ ...data }, this.addItemIndex);
         this.grid.closeEdit();
