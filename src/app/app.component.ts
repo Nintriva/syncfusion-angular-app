@@ -2,12 +2,14 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService, BooleanEditCell, extendObjWithFn } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegrid';
+import { HttpClient } from '@angular/common/http';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-angular-grids';
 import { sampleData } from './data-source';
 import { Query } from '@syncfusion/ej2-data';
 import { from, Observable } from 'rxjs';
 import { ObjectType } from '@syncfusion/ej2-pdf-export';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +40,8 @@ export class AppComponent implements OnInit {
   public width = '600px';
 
 
-  public data: Object[];
+  public data: any;
+  public customAttributes: object;
   public index: number;
   public selectedDatatype: string;
   public selectedIndex: any;
@@ -57,6 +60,8 @@ export class AppComponent implements OnInit {
   public frozenColumn: number = 0;
   public taskidRule: object;
   public assigneeRule: object;
+  public allColumns: any;
+  public baseUrl: string = 'https://data.nintrivalabs.com/data.php';
   public toolbarOptions: ToolbarItems[];
   public availableDataTypes: string[] = ['string', 'boolean', 'dropDownList', 'number', 'date'];
   public availableFonts: string[] = ['sans-serif', 'times', 'Gemunu Libre', 'Scheherazade New', 'stick No Bills'];
@@ -64,6 +69,7 @@ export class AppComponent implements OnInit {
   public selectionSettings: Object;
   public copiedData: any;
   public operation: string;
+  public showTree: boolean;
   public editTypeColumns: object = { 'boolean': 'booleanedit', 'dropDownList': 'dropdownedit', 'number': 'numericedit', 'string': 'defaultedit', 'date': 'datepickeredit' };
   public flag: boolean;
   public addItemIndex: number;
@@ -71,21 +77,50 @@ export class AppComponent implements OnInit {
   public filteringOptions: Object;
   public customStyle: any;
   // public ddParams: object;
+  constructor(private http: HttpClient) {
 
+
+  }
   ngOnInit(): void {
-    this.data = sampleData;
+    this.showTree = false;
+    this.customAttributes = { style: 'color:red' };
+
+    this.getData().subscribe(res => {
+      if (!Array.isArray(res)) {
+        this.data = sampleData;
+      } else {
+        this.data = res;
+      }
+      this.showTree = true;
+      this.loadColumns();
+      //
+      //this.data = sampleData;
+      this.load();
+    }, err => {
+
+      this.data = sampleData;
+      this.loadColumns();
+      this.load();
+    });
+  }
+  public isPrimary(column): boolean {
+    //alert(1);
+    if (column.isPrimaryKey || column.field == 'taskID') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  public load() {
     this.customStyle = [];
     this.allowMultiSorting = true;
     this.flag = false;
     this.addItemIndex = 0;
     this.filteringOptions = { type: "Excel" };
-    //   this.ddParams = { params: { value: 'Germany' } };
-    //this.selectedDatatype = '';
-    this.index = (this.data.length * 4) + 1;
+    this.index = 1200;//(this.data.length * 4) + 1;
     this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
-    this.taskidRule = { required: true, number: true, value: [this.customFn, 'Enter a unique value'] };
-
+    this.taskidRule = { required: true, number: true };
     this.selectionSettings = { type: 'Multiple' };
     this.allowTextWrap = false;
     this.wrapSettings = { wrapMode: 'Both' };
@@ -107,28 +142,53 @@ export class AppComponent implements OnInit {
       { text: 'Paste as child', target: '.e-content', id: 'pastechild', iconCss: 'e-icons e-paste' },
 
     ];
+  }
+  public loadColumns() {
+    this.getColumn().subscribe(cols => {
+      this.allColumns = cols;
 
+      console.log(this.allColumns);
+      this.showTree = true;
+      setTimeout(() => {
+        this.grid.columns.forEach((elem) => {
+          if (elem.field == 'taskID') {
+            elem.isPrimaryKey = true;
+          }
+          console.log(elem);
+          if (Array.isArray(this.allColumns)) {
+            this.allColumns.forEach((element) => {
+              console.log(element)
+              if (element.field == elem.field) {
+                console.log(element.field);
+                console.log(elem.field);
+                elem.width = element.width,
+                  elem.minWidth = element.minWidth
+              }
+            });
+            console.log(this.allColumns);
+            this.grid.setProperties({ columns: this.allColumns })
+            // this.grid.refreshColumns()
+            this.grid.refresh();
+          }
+        });
+
+      }, 200);
+    });
   }
-  public customFn = (args): boolean => {
-    return true;
-    // let count = 0;
-    // for (let i = 0; i < this.data.length; i++) {
-    //   if (args['value'].toString() === this.grid.dataSource[i]['taskID'].toString()) {
-    //     count++;
-    //   }
-    // }
-    // let ret = count > 0 ? false : true;
-    // return ret;
-    // exit;
-  }
+  // public customAttributes(elem) {
+  //   return { style: 'color:red' };
+  // }
+
+
   contextMenuClick(args: MenuEventArgs): void {
     if (args.item.id === 'delcolumn') {
       let column = this.grid.getColumnByField(args['column'].field);
       column.visible = false;
+      this.saveColumn();
       this.grid.refreshColumns();
     }
     if (args.item.id === 'delete') {
-      console.log(args);
+      //console.log(args);
       this.grid.deleteRecord(null, args['rowInfo']['rowData']);
       this.refresh();
     }
@@ -138,6 +198,7 @@ export class AppComponent implements OnInit {
 
     }
     if (args.item.id === 'add') {
+
       if (args['rowInfo'].hasOwnProperty('rowIndex')) {
         this.addItemIndex = args['rowInfo']['rowIndex'];
 
@@ -163,12 +224,6 @@ export class AppComponent implements OnInit {
       this.operation = 'copy';
       let selectedItems = this.grid.getSelectedRowIndexes();
       this.highlightColor(selectedItems, 'copy');
-      // for (let i in selectedItems) {
-      //   this.grid.getRowByIndex(selectedItems[i]).querySelectorAll('td').forEach((a, b) => {
-      //     a.style.background = 'lightpink';
-      //   });
-      //}
-
       this.copiedData = args['rowInfo']['rowData'];
       this.selectedIndex = this.grid.getSelectedRecords();
       this.grid.copy();
@@ -236,7 +291,7 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'pastechild') {
       this.grid.editSettings.newRowPosition = "Child";
-      console.log(args);
+      //console.log(args);
       this.pasteContent(args['rowInfo'].rowIndex);
 
     }
@@ -266,13 +321,13 @@ export class AppComponent implements OnInit {
         let newData = this.copyObject(element);
         objArray.push(newData['taskData']);
         await this.deleteObjectRecord(element);
-        console.log('deleting', element);
+        // console.log('deleting', element);
       })).then(async () => {
-        console.log('objArray', objArray);
+        // console.log('objArray', objArray);
         await this.wait(100);
         objArray.forEach(async (obj1: object) => {
           let data = this.copyObject(obj1);
-          console.log({ 'index': this.deletedIndex, 'data': data });
+          // console.log({ 'index': this.deletedIndex, 'data': data });
           await this.wait(1);
           this.addItemIndex = this.deletedIndex;
           await this.wait(1);
@@ -311,16 +366,16 @@ export class AppComponent implements OnInit {
           }
           if (element['index'] < this.deletedIndex) {
             this.deletedIndex--;
-            console.log(this.deletedIndex);
+            //   console.log(this.deletedIndex);
           }
         });
       }
 
       if (deleteRow == true) {
         if (element['index'] < this.deletedIndex) {
-          console.log("main");
+          // console.log("main");
           this.deletedIndex--;
-          console.log(this.deletedIndex);
+          // console.log(this.deletedIndex);
         }
         await this.wait(1);
 
@@ -334,7 +389,7 @@ export class AppComponent implements OnInit {
     return JSON.parse(JSON.stringify(element))
   }
   public changeSubTaskId(obj: object): void {
-    console.log(obj);
+    //  console.log(obj);
     if (obj.hasOwnProperty('subtasks')) {
       // obj['subtasks'] = [...obj['subtasks']];
       let arr = [];
@@ -393,7 +448,7 @@ export class AppComponent implements OnInit {
     if (rowDetails['type'] == 'date') {
       rowDetails['format'] = 'yyyy/MM/dd';
     }
-    console.log(rowDetails);
+    //  console.log(rowDetails);
     if (this.grid.columns.push(rowDetails)) {
       this.grid.refreshColumns();
       this.data.forEach((a) => {
@@ -404,10 +459,11 @@ export class AppComponent implements OnInit {
           });
         }
       });
-      this.grid.dataSource = this.data;
+      this.saveColumn();
+      // this.grid.dataSource = this.data;
       this.grid.refresh();
       this.Dialog.hide();
-      console.log(this.grid.columns);
+      // console.log(this.grid.columns);
 
     }
 
@@ -432,8 +488,9 @@ export class AppComponent implements OnInit {
       // if (newData[0] == 'boolean' || newData[0] == 'numeric') {
       //   this.grid.getColumnByField(field).format = 'N1';
       // }
+      this.saveColumn();
       this.grid.refreshColumns();
-      //this.grid.refresh();
+
       this.Dialog.hide();
     } else {
       alert("column contains item that are not in this datatype.")
@@ -455,7 +512,7 @@ export class AppComponent implements OnInit {
       'class': c,
     };
     this.customStyle[field] = { ...style, wrap: this.wrapSelect.nativeElement.value };
-    console.log(this.customStyle);
+    //  console.log(this.customStyle);
     this.grid.refreshColumns();
     this.styleDialog.hide();
   }
@@ -527,7 +584,7 @@ export class AppComponent implements OnInit {
         }
       }
       if (dataType == 'number') {
-        console.log(parseInt(element[column]))
+        //  console.log(parseInt(element[column]))
         if (isNaN(parseInt(element[column]))) {
           is_valid = false;
         }
@@ -563,8 +620,8 @@ export class AppComponent implements OnInit {
   actionBegin(args) {
 
     if (args.requestType == 'save' && args.action == 'add' && this.flag == false) {
-      console.log('beg', args);
-      console.log('this.addItemIndex', this.addItemIndex);
+      //   console.log('beg', args);
+      //   console.log('this.addItemIndex', this.addItemIndex);
       this.flag = true;
       args['cancel'] = true;
       let data = this.copyObject(args['data']);
@@ -597,18 +654,74 @@ export class AppComponent implements OnInit {
     return valid;
   }
   actionComplete(args) {
-    // console.log(args);
-    // if (args.requestType == 'save' && args.action == 'add') {
-    //   this.refresh;
-    // }
-    //  this.refresh();
 
-    //this.refresh();
-    //console.log($event);
-    //alert("ok");    //if ($event['action'] == 'Add') {
-
-    //  this.refresh();
-    //  }
+    if (args['requestType'] != 'refresh' && args['requestType'] != "beginEdit") {
+      this.saveData();
+      this.saveColumn();
+    }
   }
+  getData() {
+    let urlParams = { file: 'data', type: 'get' }
+    //  console.log(this.addParams(urlParams));
+    return this.get(urlParams);
+  }
+  saveColumn() {
+    let urlParams = { file: 'columns', type: 'save' }
+    let colFields = this.grid.getColumns();
+    console.log(colFields);
+    let data = [];
+    colFields.forEach(elem => {
+      let obj = {
+        headerText: elem.headerText,
+        field: elem.field,
+        isPrimaryKey: elem.isPrimaryKey,
+        width: elem.width,
+        minWidth: elem.minWidth,
 
+      };
+      if (elem.hasOwnProperty('customAttributes')) {
+        obj['customAttributes'] = elem.customAttributes;
+      } else {
+        //  obj['customAttributes'] = { 'style': 'color:red' };
+      }
+      data.push(obj);
+    })
+    console.log(data);
+    this.save(urlParams, data).subscribe(res => {
+
+    });
+  }
+  saveData() {
+    let urlParams = { file: 'data', type: 'save' }
+    this.save(urlParams, this.grid.dataSource).subscribe(res => {
+
+    });
+  }
+  getColumn() {
+    let urlParams = { file: 'columns', type: 'get' }
+    return this.get(urlParams);
+  }
+  save(urlParams, data) {
+    var url = this.baseUrl + '?' + this.addParams(urlParams);
+    const headers = new HttpHeaders();
+    headers.set('Content-Type', 'application/json; charset=utf-8');
+    const body = JSON.stringify(data);
+    return this.http.post(url, body, { headers: headers })
+
+  }
+  get(urlParams) {
+
+    let url = this.baseUrl + '?' + this.addParams(urlParams);
+    return this.http.get(url);
+  }
+  addParams(urlParams) {
+    var out = [];
+    for (var key in urlParams) {
+      if (urlParams.hasOwnProperty(key)) {
+        out.push(key + '=' + encodeURIComponent(urlParams[key]));
+      }
+    }
+    let l = out.join('&');
+    return l;
+  }
 }

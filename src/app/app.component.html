@@ -1,14 +1,16 @@
 <div class="control-section">
-  <ejs-treegrid [dataSource]='data' #grid id="gridcomp" [allowSorting]='true' [textWrapSettings]='wrapSettings'
-    [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap' [allowMultiSorting]='allowMultiSorting'
-    childMapping='subtasks' (actionComplete)="actionComplete($event)" (actionBegin)="actionBegin($event)"
-    [selectionSettings]='selectionSettings' [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1'
-    [allowRowDragAndDrop]='true' [allowResizing]='allowResizing' [editSettings]='editSettings'
-    [enableCollapseAll]='enableCollapseAll' [enableAutoFill]='true' [contextMenuItems]="contextMenuItems"
-    [frozenRows]='frozenRow' [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)'
-    [allowFiltering]='allowFiltering' [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
+  <ejs-treegrid *ngIf="showTree" [dataSource]='data' #grid id="gridcomp" [allowSorting]='true'
+    [textWrapSettings]='wrapSettings' [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap'
+    [allowMultiSorting]='allowMultiSorting' childMapping='subtasks' (actionComplete)="actionComplete($event)"
+    (resizeStopped)="alert(1)" (actionBegin)="actionBegin($event)" [selectionSettings]='selectionSettings'
+    [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1' [allowRowDragAndDrop]='true'
+    [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll'
+    [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
+    [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
+    [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
     <e-columns>
-      <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
+
+      <!-- <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
         textAlign='Right' isPrimaryKey='true'></e-column>
       <e-column field='assignee' headerText='Asignee' width='400' minWidth='400' [validationRules]='assigneeRule'>
       </e-column>
@@ -16,10 +18,17 @@
 
       <e-column field='duration' headerText='Duration' width='200' minWidth='200' textAlign='Right'></e-column>
       <e-column field='progress' headerText='Progress' width='200' textAlign='Right' minWidth='200'></e-column>
-      <e-column field='priority' editType='dropdownedit' headerText='Priority' width='100' minWidth='100'></e-column>
+      <e-column field='priority' editType='dropdownedit' headerText='Priority' width='100' minWidth='100'></e-column> -->
+
+      <e-column *ngFor="let column of allColumns;let i = index" [attr.data-index]="i" [field]='column.field'
+        [headerText]='column.headerText' [isPrimaryKey]="isPrimary(column)" [width]="column.width"
+        [minWidth]="column.minWidth" customAttributes="{style:'color:red'}">
+      </e-column>
     </e-columns>
   </ejs-treegrid>
-
+  <span *ngIf=" !showTree">
+    Loading...
+  </span>
   <ejs-dialog #template [header]='header' [animationSettings]='animationSettings' [visible]='false'
     [showCloseIcon]='showCloseIcon' [isModal]='true' [target]='target' [width]='width'>
     <ng-template #footerTemplate>
@@ -53,7 +62,7 @@
             <div class="col-sm-9">
 
 
-              <input *ngIf="selectedDatatype!='boolean'&& selectedDatatype!='date'" id="defaultValue" #defaultValue
+              <input *ngIf="selectedDatatype!=' boolean'&& selectedDatatype!='date'" id=" defaultValue" #defaultValue
                 class="form-control" type="text" placeholder="Enter default value" />
               <select *ngIf="selectedDatatype=='boolean'" id="defaultValue" #defaultValue class="form-control">
                 <option>true</option>

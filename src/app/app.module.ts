@@ -18,10 +18,11 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 @NgModule({
-  declarations: [AppComponent], imports: [CommonModule, ToolbarModule, GridAllModule, BrowserModule, NumericTextBoxAllModule, DialogModule, DatePickerAllModule, TreeGridAllModule, DropDownListAllModule, ReactiveFormsModule, FormsModule, CheckBoxModule], providers: [], bootstrap: [AppComponent]
+  declarations: [AppComponent], imports: [CommonModule, ToolbarModule, GridAllModule, BrowserModule, NumericTextBoxAllModule, HttpClientModule, DialogModule, DatePickerAllModule, TreeGridAllModule, DropDownListAllModule, ReactiveFormsModule, FormsModule, CheckBoxModule], providers: [], bootstrap: [AppComponent]
 })
 export class AppModule { }
