@@ -12,8 +12,8 @@
     <e-columns>
 
       <!-- <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
-        textAlign='Right' isPrimaryKey='true'></e-column>
-      <e-column field='assignee' headerText='Asignee' width='400' minWidth='400' [validationRules]='assigneeRule'>
+        textAlign='Right' isPrimaryKey='true'></e-column> -->
+      <!--  <e-column field='assignee' headerText='Asignee' width='400' minWidth='400' [validationRules]='assigneeRule'>
       </e-column>
       <e-column field='email' headerText='Email' width='200' minWidth='200' textAlign='Right'></e-column>
 
@@ -23,7 +23,8 @@
 
       <e-column *ngFor="let column of allColumns;let i = index" [attr.data-index]="i" [field]='column.field'
         [headerText]='column.headerText' [isPrimaryKey]="isPrimary(column)" [width]="column.width"
-        [minWidth]="column.minWidth" [customAttributes]="column.customAttributes" [editType]="column.editType">
+        [minWidth]="column.minWidth" [customAttributes]="column.customAttributes" [editType]="column.editType"
+        [dataSource]="column.dataSource" [fields]="column.fields" [query]="column.query">
       </e-column>
     </e-columns>
   </ejs-treegrid>

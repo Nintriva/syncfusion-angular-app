@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DialogComponent, AnimationSettingsModel } from '@syncfusion/ej2-angular-popups';
+
 import { SortService, ResizeService, PageService, EditService, ExcelExportService, TextWrapSettingsModel, FreezeService, PdfExportService, ContextMenuService, BooleanEditCell, extendObjWithFn } from '@syncfusion/ej2-angular-grids';
 import { TreeGridComponent, RowDDService } from '@syncfusion/ej2-angular-treegrid';
 import { HttpClient } from '@angular/common/http';
@@ -144,7 +145,7 @@ export class AppComponent implements OnInit {
     this.flag = false;
     this.addItemIndex = 0;
     this.filteringOptions = { type: "Excel" };
-    this.index = 1200;//(this.data.length * 4) + 1;
+    this.index = 1300;//(this.data.length * 4) + 1;
     this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
     this.taskidRule = { required: true, number: true };
@@ -263,6 +264,7 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
+      console.log(args);
       if (this.customStyle.hasOwnProperty(args['column']['field'])) {
         let elem = this.customStyle[args['column']['field']];
         this.color.nativeElement.value = elem['color'];
@@ -270,6 +272,15 @@ export class AppComponent implements OnInit {
         this.fontFamily.nativeElement.value = elem['font-family'];
         this.fontSize.nativeElement.value = elem['font-size'];
         this.wrapSelect.nativeElement.value = elem['wrap'];
+
+      } else if (args['column']['customAttributes'].hasOwnProperty('style')) {
+        let elem = args['column']['customAttributes']['style'];
+        console.log(args['column']['customAttributes']);
+        this.color.nativeElement.value = elem['color'];
+        this.bgColor.nativeElement.value = elem['background-color'];
+        this.fontFamily.nativeElement.value = elem['font-family'];
+        this.fontSize.nativeElement.value = elem['font-size'];
+        this.wrapSelect.nativeElement.value = args['column']['customAttributes']['class'] == 'a-erow' ? 'Disable' : 'Enable';
 
       } else {
         this.color.nativeElement.value = '#000000';
@@ -456,7 +467,7 @@ export class AppComponent implements OnInit {
       let dropValues = this.dropDownValues.nativeElement.value;
       let elems = dropValues.split(',');
       elems.forEach(element => {
-        ds.push({ type: element });
+        ds.push({ type: element, value: element, text: element });
       });
       let editParams = {
         params: {
@@ -710,13 +721,18 @@ export class AppComponent implements OnInit {
           width: elem.width,
           minWidth: elem.minWidth,
           editType: elem.editType,
+
         };
 
         if (elem.hasOwnProperty('customAttributes')) {
           obj['customAttributes'] = elem.customAttributes;
-        } else {
-          //  obj['customAttributes'] = { 'style': 'color:red' };
         }
+        if (elem['edit'].hasOwnProperty('params')) {
+          obj['dataSource'] = elem['edit']['params']['dataSource'];
+          obj['fields'] = { value: 'type', text: 'type' };
+          obj['query'] = new Query();
+        }
+
         data.push(obj);
       }
     })
@@ -747,6 +763,7 @@ export class AppComponent implements OnInit {
     var url = this.baseUrl + '?' + this.addParams(urlParams);
     const headers = new HttpHeaders();
     headers.set('Content-Type', 'application/json; charset=utf-8');
+    console.log(data);
     const body = JSON.stringify(data);
     return this.http.post(url, body, { headers: headers })
 
