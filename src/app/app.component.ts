@@ -43,6 +43,7 @@ export class AppComponent implements OnInit {
   public data: any;
   public customAttributes: object;
   public index: number;
+  public generalSettings: Object = {};
   public selectedDatatype: string;
   public selectedIndex: any;
   public contextMenuItems: any;
@@ -82,26 +83,52 @@ export class AppComponent implements OnInit {
 
   }
   ngOnInit(): void {
+    this.generalSettings = {
+      freeze: 0,
+      collapse: false,
+      sort: false,
+      filter: false,
+    }
     this.showTree = false;
-    this.customAttributes = { style: 'color:red' };
+    if (this.loadColumns()) {
+      this.getGenSettings().subscribe(res => {
 
-    this.getData().subscribe(res => {
-      if (!Array.isArray(res)) {
-        this.data = sampleData;
-      } else {
-        this.data = res;
-      }
-      this.showTree = true;
-      this.loadColumns();
-      //
-      //this.data = sampleData;
-      this.load();
-    }, err => {
+        if (res.hasOwnProperty('freeze')) {
+          this.generalSettings = res;
 
-      this.data = sampleData;
-      this.loadColumns();
-      this.load();
-    });
+        }
+      })
+      this.getData().subscribe(res => {
+        if (!Array.isArray(res)) {
+          //  this.data = sampleData;
+        } else {
+          this.showTree = true;
+          this.load();
+          this.data = res;
+          //  this.grid.refreshColumns();
+          // this.refresh();
+        }
+      });
+
+
+    }
+    // this.getData().subscribe(res => {
+    //   if (!Array.isArray(res)) {
+    //     this.data = sampleData;
+    //   } else {
+    //     this.data = res;
+    //   }
+    //   this.showTree = true;
+    //   this.loadColumns();
+    //   //
+    //   //this.data = sampleData;
+    //   this.load();
+    // }, err => {
+
+    //   this.data = sampleData;
+    //   this.loadColumns();
+    //   this.load();
+    // });
   }
   public isPrimary(column): boolean {
     //alert(1);
@@ -144,36 +171,23 @@ export class AppComponent implements OnInit {
     ];
   }
   public loadColumns() {
-    this.getColumn().subscribe(cols => {
-      this.allColumns = cols;
+    return this.getColumn().subscribe(cols => {
 
-      console.log(this.allColumns);
+      this.allColumns = cols;
       this.showTree = true;
-      setTimeout(() => {
-        this.grid.columns.forEach((elem) => {
-          if (elem.field == 'taskID') {
-            elem.isPrimaryKey = true;
-          }
-          console.log(elem);
-          if (Array.isArray(this.allColumns)) {
-            this.allColumns.forEach((element) => {
-              console.log(element)
-              if (element.field == elem.field) {
-                console.log(element.field);
-                console.log(elem.field);
-                elem.width = element.width,
-                  elem.minWidth = element.minWidth
-              }
-            });
-            console.log(this.allColumns);
-            this.grid.setProperties({ columns: this.allColumns })
-            // this.grid.refreshColumns()
-            this.grid.refresh();
+      if (Array.isArray(this.allColumns)) {
+        this.allColumns.forEach((element) => {
+          if (element.field == 'taskID') {
+            element.isPrimaryKey = true;
           }
         });
-
-      }, 200);
+        //console.log(this.allColumns);
+        // this.grid.setProperties({ columns: this.allColumns })
+        // this.grid.refreshColumns()
+        //this.grid.refresh();
+      }
     });
+
   }
   // public customAttributes(elem) {
   //   return { style: 'color:red' };
@@ -182,20 +196,23 @@ export class AppComponent implements OnInit {
 
   contextMenuClick(args: MenuEventArgs): void {
     if (args.item.id === 'delcolumn') {
-      let column = this.grid.getColumnByField(args['column'].field);
-      column.visible = false;
-      this.saveColumn();
+      let column = this.grid.getColumnByField(args['column'].field).visible = false;
+      //column.visible = false;
       this.grid.refreshColumns();
+      this.saveColumn();
     }
     if (args.item.id === 'delete') {
       //console.log(args);
       this.grid.deleteRecord(null, args['rowInfo']['rowData']);
-      this.refresh();
+      console.log(this.data);
+      this.saveData();
+      //   this.refresh();
     }
     if (args.item.id === 'freezecolumn') {
       let column = this.grid.getColumnByField(args['column'].field);
       this.frozenColumn = this.frozenColumn > 0 ? 0 : this.getIndex(column.field) + 1;
-
+      this.generalSettings['freeze'] = this.frozenColumn;
+      this.saveGenSettings();
     }
     if (args.item.id === 'add') {
 
@@ -219,6 +236,8 @@ export class AppComponent implements OnInit {
 
     if (args.item.id === 'filter') {
       this.allowFiltering = !this.allowFiltering;
+      this.generalSettings['filter'] = this.allowFiltering;
+      this.saveGenSettings();
     }
     if (args.item.id === 'copy') {
       this.operation = 'copy';
@@ -239,11 +258,12 @@ export class AppComponent implements OnInit {
     }
     if (args.item.id === 'collapse') {
       this.enableCollapseAll = !this.enableCollapseAll;
+      this.generalSettings['collapse'] = this.enableCollapseAll;
+      this.saveGenSettings();
     }
     if (args.item.id === 'style') {
       this.colField.nativeElement.value = args['column']['field'];
       if (this.customStyle.hasOwnProperty(args['column']['field'])) {
-
         let elem = this.customStyle[args['column']['field']];
         this.color.nativeElement.value = elem['color'];
         this.bgColor.nativeElement.value = elem['background-color'];
@@ -263,6 +283,8 @@ export class AppComponent implements OnInit {
 
     if (args.item.id === 'sort') {
       this.allowMultiSorting = !this.allowMultiSorting;
+      this.generalSettings['sort'] = this.allowMultiSorting;
+      this.saveGenSettings();
     }
     if (args.item.id === 'addcolumn') {
       this.field.nativeElement.value = '';
@@ -488,9 +510,9 @@ export class AppComponent implements OnInit {
       // if (newData[0] == 'boolean' || newData[0] == 'numeric') {
       //   this.grid.getColumnByField(field).format = 'N1';
       // }
-      this.saveColumn();
+      //this.saveColumn();
       this.grid.refreshColumns();
-
+      this.saveColumn();
       this.Dialog.hide();
     } else {
       alert("column contains item that are not in this datatype.")
@@ -513,8 +535,10 @@ export class AppComponent implements OnInit {
     };
     this.customStyle[field] = { ...style, wrap: this.wrapSelect.nativeElement.value };
     //  console.log(this.customStyle);
+    // this.saveColumn();
     this.grid.refreshColumns();
     this.styleDialog.hide();
+    this.saveColumn();
   }
   public getDataFromClipBoard(): any {
     let arr = [];
@@ -618,7 +642,6 @@ export class AppComponent implements OnInit {
   }
 
   actionBegin(args) {
-
     if (args.requestType == 'save' && args.action == 'add' && this.flag == false) {
       //   console.log('beg', args);
       //   console.log('this.addItemIndex', this.addItemIndex);
@@ -628,8 +651,9 @@ export class AppComponent implements OnInit {
       if (this.validatePk(data['taskID'])) {
         this.grid.addRecord({ ...data }, this.addItemIndex);
         this.grid.closeEdit();
+        // this.grid.StateHasChanged();
         //this.grid.refresh();
-        this.refresh();
+        //   this.refresh();
         this.flag = false;
       } else {
         alert("Task ID should be unique id");
@@ -653,11 +677,18 @@ export class AppComponent implements OnInit {
     });
     return valid;
   }
-  actionComplete(args) {
 
-    if (args['requestType'] != 'refresh' && args['requestType'] != "beginEdit") {
-      this.saveData();
-      this.saveColumn();
+  actionComplete(args) {
+    console.log(this.grid.dataSource);
+    if (args['requestType'] === 'save' || args['requestType'] === 'reorder') {
+      //  this.data[args['index']] = args['data'];
+      this.grid.refresh();
+      setTimeout(() => {
+
+        this.saveData();
+
+        // this.saveColumn();
+      }, 1000);
     }
   }
   getData() {
@@ -671,22 +702,25 @@ export class AppComponent implements OnInit {
     console.log(colFields);
     let data = [];
     colFields.forEach(elem => {
-      let obj = {
-        headerText: elem.headerText,
-        field: elem.field,
-        isPrimaryKey: elem.isPrimaryKey,
-        width: elem.width,
-        minWidth: elem.minWidth,
+      if (elem.visible) {
+        let obj = {
+          headerText: elem.headerText,
+          field: elem.field,
+          isPrimaryKey: elem.isPrimaryKey,
+          width: elem.width,
+          minWidth: elem.minWidth,
+          editType: elem.editType,
+        };
 
-      };
-      if (elem.hasOwnProperty('customAttributes')) {
-        obj['customAttributes'] = elem.customAttributes;
-      } else {
-        //  obj['customAttributes'] = { 'style': 'color:red' };
+        if (elem.hasOwnProperty('customAttributes')) {
+          obj['customAttributes'] = elem.customAttributes;
+        } else {
+          //  obj['customAttributes'] = { 'style': 'color:red' };
+        }
+        data.push(obj);
       }
-      data.push(obj);
     })
-    console.log(data);
+
     this.save(urlParams, data).subscribe(res => {
 
     });
@@ -694,8 +728,16 @@ export class AppComponent implements OnInit {
   saveData() {
     let urlParams = { file: 'data', type: 'save' }
     this.save(urlParams, this.grid.dataSource).subscribe(res => {
-
     });
+  }
+  saveGenSettings() {
+    let urlParams = { file: 'settings', type: 'save' }
+    this.save(urlParams, this.generalSettings).subscribe(res => {
+    });
+  }
+  getGenSettings() {
+    let urlParams = { file: 'settings', type: 'get' }
+    return this.get(urlParams);
   }
   getColumn() {
     let urlParams = { file: 'columns', type: 'get' }

@@ -1,13 +1,14 @@
 <div class="control-section">
+
   <ejs-treegrid *ngIf="showTree" [dataSource]='data' #grid id="gridcomp" [allowSorting]='true'
     [textWrapSettings]='wrapSettings' [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap'
-    [allowMultiSorting]='allowMultiSorting' childMapping='subtasks' (actionComplete)="actionComplete($event)"
-    (resizeStopped)="alert(1)" (actionBegin)="actionBegin($event)" [selectionSettings]='selectionSettings'
+    [allowMultiSorting]='generalSettings.sort' childMapping='subtasks' (actionComplete)="actionComplete($event)"
+    (resizeStop)="saveColumn()" (actionBegin)="actionBegin($event)" [selectionSettings]='selectionSettings'
     [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1' [allowRowDragAndDrop]='true'
-    [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='enableCollapseAll'
+    [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='generalSettings.collapse'
     [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
-    [frozenColumns]='frozenColumn' (contextMenuClick)='contextMenuClick($event)' [allowFiltering]='allowFiltering'
-    [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
+    [frozenColumns]='generalSettings.freeze' (contextMenuClick)='contextMenuClick($event)'
+    [allowFiltering]='generalSettings.filter' [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
     <e-columns>
 
       <!-- <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
@@ -22,7 +23,7 @@
 
       <e-column *ngFor="let column of allColumns;let i = index" [attr.data-index]="i" [field]='column.field'
         [headerText]='column.headerText' [isPrimaryKey]="isPrimary(column)" [width]="column.width"
-        [minWidth]="column.minWidth" customAttributes="{style:'color:red'}">
+        [minWidth]="column.minWidth" [customAttributes]="column.customAttributes" [editType]="column.editType">
       </e-column>
     </e-columns>
   </ejs-treegrid>
