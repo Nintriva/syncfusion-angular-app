@@ -704,7 +704,7 @@ export class AppComponent implements OnInit {
   }
 
   actionComplete(args) {
-    console.log(this.grid.dataSource);
+    console.log(args);
     if (args['requestType'] === 'save' || args['requestType'] === 'reorder') {
       //  this.data[args['index']] = args['data'];
       this.grid.refresh();
@@ -712,7 +712,7 @@ export class AppComponent implements OnInit {
 
         this.saveData();
 
-        // this.saveColumn();
+        this.saveColumn();
       }, 1000);
     }
   }
