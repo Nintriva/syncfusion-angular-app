@@ -4,7 +4,7 @@
     [textWrapSettings]='wrapSettings' [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap'
     [allowMultiSorting]='generalSettings.sort' childMapping='subtasks' (actionComplete)="actionComplete($event)"
     (resizeStop)="saveColumn()" (actionBegin)="actionBegin($event)" [selectionSettings]='selectionSettings'
-    [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='1' [allowRowDragAndDrop]='true'
+    [allowSelection]='true' [showColumnChooser]='true' [treeColumnIndex]='0' [allowRowDragAndDrop]='true'
     [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='generalSettings.collapse'
     [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
     [frozenColumns]='generalSettings.freeze' (contextMenuClick)='contextMenuClick($event)'
@@ -24,7 +24,8 @@
       <e-column *ngFor="let column of allColumns;let i = index" [attr.data-index]="i" [field]='column.field'
         [headerText]='column.headerText' [isPrimaryKey]="isPrimary(column)" [width]="column.width"
         [minWidth]="column.minWidth" [customAttributes]="column.customAttributes" [editType]="column.editType"
-        [dataSource]="column.dataSource" [fields]="column.fields" [query]="column.query">
+        [textAlign]="column.textAlign" [dataSource]="column.dataSource" [fields]="column.fields" [query]="column.query"
+        [defaultValue]="column.defaultValue">
       </e-column>
     </e-columns>
   </ejs-treegrid>
@@ -64,7 +65,7 @@
             <div class="col-sm-9">
 
 
-              <input *ngIf="selectedDatatype!=' boolean'&& selectedDatatype!='date'" id=" defaultValue" #defaultValue
+              <input *ngIf="selectedDatatype!='boolean'&& selectedDatatype!='date'" id=" defaultValue" #defaultValue
                 class="form-control" type="text" placeholder="Enter default value" />
               <select *ngIf="selectedDatatype=='boolean'" id="defaultValue" #defaultValue class="form-control">
                 <option>true</option>

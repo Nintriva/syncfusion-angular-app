@@ -93,10 +93,8 @@ export class AppComponent implements OnInit {
     this.showTree = false;
     if (this.loadColumns()) {
       this.getGenSettings().subscribe(res => {
-
         if (res.hasOwnProperty('freeze')) {
           this.generalSettings = res;
-
         }
       })
       this.getData().subscribe(res => {
@@ -105,7 +103,9 @@ export class AppComponent implements OnInit {
         } else {
           this.showTree = true;
           this.load();
+          // this.data = sampleData;
           this.data = res;
+          this.findBiggestIndex();
           //  this.grid.refreshColumns();
           // this.refresh();
         }
@@ -145,7 +145,7 @@ export class AppComponent implements OnInit {
     this.flag = false;
     this.addItemIndex = 0;
     this.filteringOptions = { type: "Excel" };
-    this.index = 1300;//(this.data.length * 4) + 1;
+    // this.index = 1300;//(this.data.length * 4) + 1;
     this.toolbarOptions = ['ColumnChooser'];
     this.assigneeRule = { required: true };
     this.taskidRule = { required: true, number: true };
@@ -171,6 +171,12 @@ export class AppComponent implements OnInit {
 
     ];
   }
+  public showInGrid(elem) {
+    if (elem['field'] == 'taskID') {
+      return false;
+    }
+    return true;
+  }
   public loadColumns() {
     return this.getColumn().subscribe(cols => {
 
@@ -180,6 +186,7 @@ export class AppComponent implements OnInit {
         this.allColumns.forEach((element) => {
           if (element.field == 'taskID') {
             element.isPrimaryKey = true;
+
           }
         });
         //console.log(this.allColumns);
@@ -196,6 +203,7 @@ export class AppComponent implements OnInit {
 
 
   contextMenuClick(args: MenuEventArgs): void {
+
     if (args.item.id === 'delcolumn') {
       let column = this.grid.getColumnByField(args['column'].field).visible = false;
       //column.visible = false;
@@ -236,8 +244,8 @@ export class AppComponent implements OnInit {
     }
 
     if (args.item.id === 'filter') {
-      this.allowFiltering = !this.allowFiltering;
-      this.generalSettings['filter'] = this.allowFiltering;
+      //   this.allowFiltering = !this.allowFiltering;
+      this.generalSettings['filter'] = !this.generalSettings['filter'];
       this.saveGenSettings();
     }
     if (args.item.id === 'copy') {
@@ -258,8 +266,9 @@ export class AppComponent implements OnInit {
 
     }
     if (args.item.id === 'collapse') {
-      this.enableCollapseAll = !this.enableCollapseAll;
-      this.generalSettings['collapse'] = this.enableCollapseAll;
+      // alert(this.enableCollapseAll);
+      //  this.enableCollapseAll = !this.enableCollapseAll;
+      this.generalSettings['collapse'] = !this.generalSettings['collapse'];
       this.saveGenSettings();
     }
     if (args.item.id === 'style') {
@@ -273,7 +282,7 @@ export class AppComponent implements OnInit {
         this.fontSize.nativeElement.value = elem['font-size'];
         this.wrapSelect.nativeElement.value = elem['wrap'];
 
-      } else if (args['column']['customAttributes'].hasOwnProperty('style')) {
+      } else if (args['column']['customAttributes'] && args['column']['customAttributes'].hasOwnProperty('style')) {
         let elem = args['column']['customAttributes']['style'];
         console.log(args['column']['customAttributes']);
         this.color.nativeElement.value = elem['color'];
@@ -293,9 +302,11 @@ export class AppComponent implements OnInit {
     }
 
     if (args.item.id === 'sort') {
-      this.allowMultiSorting = !this.allowMultiSorting;
-      this.generalSettings['sort'] = this.allowMultiSorting;
-      this.saveGenSettings();
+      //  this.allowMultiSorting = !this.allowMultiSorting;
+      this.generalSettings['sort'] = !this.generalSettings['sort'];
+      if (this.saveGenSettings()) {
+        this.grid.refresh();
+      }
     }
     if (args.item.id === 'addcolumn') {
       this.field.nativeElement.value = '';
@@ -343,6 +354,7 @@ export class AppComponent implements OnInit {
   public pasteContent(index: number) {
     this.grid.showSpinner();
     this.flag = true;
+    this.index++;
     // let newData = this.copiedData;
     // let numberOfDeletedRows = 0;
 
@@ -667,6 +679,7 @@ export class AppComponent implements OnInit {
         //   this.refresh();
         this.flag = false;
       } else {
+
         alert("Task ID should be unique id");
       }
 
@@ -676,6 +689,7 @@ export class AppComponent implements OnInit {
     let valid = true;
     this.data.forEach((element) => {
       if (element['taskID'] == taskID) {
+        console.log(element);
         valid = false;
       }
       if (element.hasOwnProperty('subtasks')) {
@@ -721,7 +735,8 @@ export class AppComponent implements OnInit {
           width: elem.width,
           minWidth: elem.minWidth,
           editType: elem.editType,
-
+          textAlign: elem.textAlign,
+          defaultValue: elem.defaultValue,
         };
 
         if (elem.hasOwnProperty('customAttributes')) {
@@ -749,7 +764,9 @@ export class AppComponent implements OnInit {
   saveGenSettings() {
     let urlParams = { file: 'settings', type: 'save' }
     this.save(urlParams, this.generalSettings).subscribe(res => {
+      return true;
     });
+    return false;
   }
   getGenSettings() {
     let urlParams = { file: 'settings', type: 'get' }
@@ -782,5 +799,19 @@ export class AppComponent implements OnInit {
     }
     let l = out.join('&');
     return l;
+  }
+  findBiggestIndex() {
+    this.index = 0;
+    this.findbigger(this.data);
+  }
+  findbigger(elem) {
+    elem.forEach(element => {
+      if (element['taskID'] > this.index) {
+        this.index = element['taskID'];
+      }
+      if (element.hasOwnProperty('subtasks')) {
+        this.findbigger(element['subtasks']);
+      }
+    });
   }
 }
