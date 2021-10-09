@@ -705,7 +705,7 @@ export class AppComponent implements OnInit {
 
   actionComplete(args) {
     console.log(args);
-    if (args['requestType'] === 'save' || args['requestType'] === 'reorder') {
+    if (args['requestType'] === 'delete' || args['requestType'] === 'save' || args['requestType'] === 'reorder') {
       //  this.data[args['index']] = args['data'];
       this.grid.refresh();
       setTimeout(() => {
