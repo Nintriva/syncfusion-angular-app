@@ -528,7 +528,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => this.saveData(), 3000);
   }
   public dataStateChange(event) {
-    alert(1);
+
   }
   public editColumn = (): void => {
     // let index = this.colIndex.nativeElement.value;
