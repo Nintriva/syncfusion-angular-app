@@ -496,15 +496,17 @@ export class AppComponent implements OnInit {
     //  console.log(rowDetails);
     if (this.grid.columns.push(rowDetails)) {
       this.grid.refreshColumns();
-      this.data.forEach((a) => {
-        a[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
-        if (a.hasOwnProperty('subtasks')) {
-          a['subtasks'].forEach((b) => {
-            b[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
-          });
-        }
-      });
+      // this.data.forEach((a) => {
+      //   a[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
+      //   if (a.hasOwnProperty('subtasks')) {
+      //     a['subtasks'].forEach((b) => {
+      //       b[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
+      //     });
+      //   }
+      // });
+      this.updateData(this.data, field, defaultValue, dataType)
       this.saveColumn();
+      this.saveData();
       // this.grid.dataSource = this.data;
       this.grid.refresh();
       this.Dialog.hide();
@@ -513,7 +515,21 @@ export class AppComponent implements OnInit {
     }
 
   }
+  public updateData(data, field, defaultValue, dataType) {
+    data.forEach((a) => {
+      a[field] = dataType.includes('number') ? parseFloat(defaultValue) : defaultValue;
+      if (a.hasOwnProperty('subtasks')) {
+        this.updateData(a['subtasks'], field, defaultValue, dataType);
+      }
+    });
+  }
 
+  public rowDrop(event) {
+    setTimeout(() => this.saveData(), 3000);
+  }
+  public dataStateChange(event) {
+    alert(1);
+  }
   public editColumn = (): void => {
     // let index = this.colIndex.nativeElement.value;
     if (this.validateUpdate()) {

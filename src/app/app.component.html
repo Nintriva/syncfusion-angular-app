@@ -8,7 +8,8 @@
     [allowResizing]='allowResizing' [editSettings]='editSettings' [enableCollapseAll]='generalSettings.collapse'
     [enableAutoFill]='true' [contextMenuItems]="contextMenuItems" [frozenRows]='frozenRow'
     [frozenColumns]='generalSettings.freeze' (contextMenuClick)='contextMenuClick($event)'
-    [allowFiltering]='generalSettings.filter' [allowReordering]='allowReordering' [filterSettings]='filteringOptions'>
+    [allowFiltering]='generalSettings.filter' [allowReordering]='allowReordering' [filterSettings]='filteringOptions'
+    (dataStateChange)='dataStateChange($event)' (rowDrop)="rowDrop($event)">
     <e-columns>
 
       <!-- <e-column field='taskID' headerText='Task Id' [validationRules]='taskidRule' width='100' minWidth='100'
