@@ -1,5 +1,4 @@
 <div class="control-section">
-
   <ejs-treegrid *ngIf="showTree" [dataSource]='data' #grid id="gridcomp" [allowSorting]='true'
     [textWrapSettings]='wrapSettings' [toolbar]='toolbarOptions' [allowTextWrap]='allowTextWrap'
     [allowMultiSorting]='generalSettings.sort' childMapping='subtasks' (actionComplete)="actionComplete($event)"

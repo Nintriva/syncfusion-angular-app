@@ -149,3 +149,11 @@ form td.e-rowcell {
 .test {
   color: red;
 }
+
+.control-section {
+  background-color: red;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
